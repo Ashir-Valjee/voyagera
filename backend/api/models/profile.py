@@ -17,7 +17,7 @@ class Profile(models.Model):
         City,
         null = True,
         blank = True,
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT
     )
 
     likes_music = models.BooleanField(default=False)
