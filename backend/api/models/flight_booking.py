@@ -24,13 +24,13 @@ class FlightBooking(models.Model):
         related_name="destination_city"
     )
 
-    depature_airport = models.CharField(max_length=255)
+    departure_airport = models.CharField(max_length=255)
 
     destination_airport = models.CharField(max_length=255)
 
     date_created = models.DateTimeField(auto_now_add=True)
 
-    depature_date_time = models.DateTimeField()
+    departure_date_time = models.DateTimeField()
 
     arrival_date_time = models.DateTimeField()
 
