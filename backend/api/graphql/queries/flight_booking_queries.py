@@ -2,7 +2,7 @@ import graphene
 from graphene_django import DjangoObjectType
 from ..types.flight_booking_type import FlightBookingType
 from ...models.flight_booking import FlightBooking
-from ...models.city import City
+
 
 
 class FlightBookingQueries(graphene.ObjectType):

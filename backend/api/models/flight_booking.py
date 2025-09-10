@@ -14,13 +14,13 @@ class FlightBooking(models.Model):
 
     departure_city = models.ForeignKey(
         City,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="departure_city"
     )
 
     destination_city = models.ForeignKey(
         City,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name="destination_city"
     )
 
