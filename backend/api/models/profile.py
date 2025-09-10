@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from .city import City
 
 class Profile(models.Model):
     user = models.OneToOneField(
@@ -12,10 +13,11 @@ class Profile(models.Model):
     profile_pic_url = models.URLField(blank=True)
 
     # placeholder until City model exists; will convert to FK later
-    home_city = models.BigIntegerField(
-        null=True,
-        blank=True,
-        help_text="City ID (will be converted to a ForeignKey to City later)"
+    home_city = models.ForeignKey( 
+        City,
+        null = False,
+        blank = False,
+        on_delete=models.CASCADE
     )
 
     likes_music = models.BooleanField(default=False)
@@ -23,6 +25,7 @@ class Profile(models.Model):
     likes_arts = models.BooleanField(default=False)
     likes_film = models.BooleanField(default=False)
     likes_family = models.BooleanField(default=False)
+
 
     # handy timestamps
     created_at = models.DateTimeField(auto_now_add=True)
