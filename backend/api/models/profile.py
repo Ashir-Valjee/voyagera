@@ -10,13 +10,13 @@ class Profile(models.Model):
     )
 
    
-    profile_pic_url = models.URLField(blank=True)
+    profile_pic_url = models.URLField(blank=True, default="https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png")
 
     # placeholder until City model exists; will convert to FK later
     home_city = models.ForeignKey( 
         City,
-        null = False,
-        blank = False,
+        null = True,
+        blank = True,
         on_delete=models.CASCADE
     )
 
