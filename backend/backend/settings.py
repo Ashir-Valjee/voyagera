@@ -29,6 +29,15 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+GRAPHENE = {
+    "SCHEMA": "api.schema.schema",
+}
+
+JWT_ACCESS_SECRET = os.getenv("JWT_ACCESS_SECRET", SECRET_KEY)
+JWT_REFRESH_SECRET = os.getenv("JWT_REFRESH_SECRET", SECRET_KEY)
+JWT_ALG = os.getenv("JWT_ALG", "HS256")
+JWT_ACCESS_MINUTES = int(os.getenv("JWT_ACCESS_MINUTES", "30"))
+JWT_REFRESH_DAYS = int(os.getenv("JWT_REFRESH_DAYS", "7"))
 
 # Application definition
 
@@ -39,8 +48,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'api',
+    
     'graphene_django',
+    "api.apps.ApiConfig",
 ]
 
 MIDDLEWARE = [
