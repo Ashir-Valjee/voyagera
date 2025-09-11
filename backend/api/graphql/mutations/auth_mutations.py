@@ -2,6 +2,7 @@ import graphene
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import check_password, make_password
 from django.db import transaction
+from api.models import Profile
 
 from api.lib.token import (
     generate_access_token,
@@ -29,6 +30,9 @@ class Register(graphene.Mutation):
             email=email,
             password=make_password(password),
         )
+        # create a profile explicitly
+        Profile.objects.get_or_create(user=user)
+
         return Register(
             access=generate_access_token(user.id, user.email),
             refresh=generate_refresh_token(user.id),
