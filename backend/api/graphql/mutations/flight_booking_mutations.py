@@ -53,6 +53,33 @@ class CreateFlightBookingMutation(graphene.Mutation):
             errors=[]
         )
 
+class UpdateFlightBookingMutation(graphene.Mutation):
+    flight_booking = graphene.Field(FlightBookingType)
+    success = graphene.Boolean()
+    errors = graphene.List(graphene.String)
+
+    class Arguments:
+        id = graphene.ID(required=True)
+        number_of_passengers = graphene.Int(required=True)
+        total_price = graphene.Decimal(required=True)
+        
+    
+    @classmethod
+    def mutate(cls, root, info, **kwargs):
+        flight_booking = FlightBooking.objects.get(pk=kwargs.get("id"))
+        require_user(info)
+
+        flight_booking.number_of_passengers = kwargs.get("number_of_passengers")
+        flight_booking.total_price = kwargs.get("total_price")
+        flight_booking.save()
+
+        return UpdateFlightBookingMutation(
+            flight_booking=flight_booking, 
+            success=True,
+            errors=[]
+        )
+
 
 class FlightBookingMutations(graphene.ObjectType):
     create_flight_booking = CreateFlightBookingMutation.Field()
+    update_flight_booking = UpdateFlightBookingMutation.Field()
