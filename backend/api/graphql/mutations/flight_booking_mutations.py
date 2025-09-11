@@ -54,5 +54,5 @@ class CreateFlightBookingMutation(graphene.Mutation):
         )
 
 
-class Mutation(graphene.ObjectType):
+class FlightBookingMutations(graphene.ObjectType):
     create_flight_booking = CreateFlightBookingMutation.Field()
