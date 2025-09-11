@@ -11,6 +11,6 @@ class Query(UserQueries, CityQueries,FlightBookingQueries, ActivityBookingQuerie
     pass
 
 class Mutation(AuthMutations, CreateFlightBookingMutation, graphene.ObjectType):
-    pass
+    create_flight_booking = CreateFlightBookingMutation.Field()
 
 schema = graphene.Schema(query=Query, mutation=Mutation)

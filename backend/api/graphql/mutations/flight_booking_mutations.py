@@ -6,7 +6,10 @@ from graphql import GraphQLError
 from ..utils.auth import require_user
 
 class CreateFlightBookingMutation(graphene.Mutation):
-    create_flight_booking = graphene.Field(FlightBookingType)
+    flight_booking = graphene.Field(FlightBookingType)
+    success = graphene.Boolean()
+    errors = graphene.List(graphene.String)
+
     class Arguments:
         # The input arguments for this mutation
         departure_city_id = graphene.ID(required=True)
@@ -44,7 +47,11 @@ class CreateFlightBookingMutation(graphene.Mutation):
         )
 
         # Notice we return an instance of this mutation
-        return CreateFlightBookingMutation(create_flight_booking=create_flight_booking)
+        return CreateFlightBookingMutation(
+            flight_booking=create_flight_booking, 
+            success=True,
+            errors=[]
+        )
 
 
 class Mutation(graphene.ObjectType):
