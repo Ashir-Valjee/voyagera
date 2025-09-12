@@ -43,6 +43,30 @@ class CreateActivityBookingMutation(graphene.Mutation):
             errors=[]
         )
         
+class UpdateActivityBookingMutation(graphene.Mutation):
+    activity_booking = graphene.Field(ActivityBookingType)     
+    success = graphene.Boolean()
+    errors = graphene.List(graphene.String)
+    
+    class Arguments:
+        id = graphene.ID(required=True)
+        number_of_people = graphene.Int(required=True)
+        total_price = graphene.Decimal(required=True)
+        
+    @classmethod
+    def mutate(cls, root, info, **kwargs):
+        require_user(info)
+        activity_booking = ActivityBooking.objects.get(pk=kwargs.get("id"))
+        
+        activity_booking.number_of_people = kwargs.get("number_of_people")
+        activity_booking.total_price = kwargs.get("total_price")
+        activity_booking.save()
+        
+        return UpdateActivityBookingMutation(
+            activity_booking=activity_booking,
+            success=True,
+            errors=[]
+        )
         
 class DeleteActivityBookingMutation(graphene.Mutation):
     activity_booking = graphene.Field(ActivityBookingType)
@@ -66,4 +90,5 @@ class DeleteActivityBookingMutation(graphene.Mutation):
         
 class ActivityBookingMutations(graphene.ObjectType):
     create_activity_booking = CreateActivityBookingMutation.Field()
+    update_activity_booking = UpdateActivityBookingMutation.Field()
     delete_activity_booking = DeleteActivityBookingMutation.Field()
