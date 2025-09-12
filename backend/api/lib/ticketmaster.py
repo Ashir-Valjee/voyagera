@@ -1,8 +1,11 @@
 import os
 import requests
+from dotenv import load_dotenv
 
-base_url = "https://app.ticketmaster.com/discovery/v2/events"
-api_key = "GG1CRiIXOIGiCWDyY1qkxkX6dNjHOutc"
+load_dotenv()
+
+base_url = os.getenv("TICKETMASTER_BASE_URL")
+api_key = os.getenv("TICKETMASTER_API_KEY")
 
 def search_ticketmaster_events(
         countryCode = "GB",
