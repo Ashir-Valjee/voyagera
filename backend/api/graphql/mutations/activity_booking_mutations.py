@@ -51,9 +51,6 @@ class DeleteActivityBookingMutation(graphene.Mutation):
 
     class Arguments:
         id = graphene.ID(required=True)
-        number_of_passengers = graphene.Int(required=True)
-        total_price = graphene.Decimal(required=True)
-        
     
     @classmethod
     def mutate(cls, root, info, **kwargs):
