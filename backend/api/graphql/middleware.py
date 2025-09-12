@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser
 import jwt
-from api.lib.token import decode_access
+from api.lib.jwt_token import decode_access
 
 class JWTAuthMiddleware:
     def resolve(self, next, root, info, **kwargs):

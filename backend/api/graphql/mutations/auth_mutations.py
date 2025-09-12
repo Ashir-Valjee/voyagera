@@ -4,7 +4,7 @@ from django.contrib.auth.hashers import check_password, make_password
 from django.db import transaction
 from api.models import Profile
 
-from api.lib.token import (
+from api.lib.jwt_token import (
     generate_access_token,
     generate_refresh_token,
     decode_refresh,
