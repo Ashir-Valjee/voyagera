@@ -7,11 +7,12 @@ from api.graphql.queries.activity_booking_queries import ActivityBookingQueries
 from api.graphql.queries.profile_queries import ProfileQueries
 from api.graphql.mutations.flight_booking_mutations import FlightBookingMutations
 from api.graphql.mutations.activity_booking_mutations import ActivityBookingMutations
+from api.graphql.mutations.profile_mutations import ProfileMutation
 
 class Query(UserQueries, CityQueries,FlightBookingQueries, ActivityBookingQueries, ProfileQueries, graphene.ObjectType):
     pass
 
-class Mutation(AuthMutations, FlightBookingMutations, ActivityBookingMutations, graphene.ObjectType):
+class Mutation(AuthMutations, FlightBookingMutations, ActivityBookingMutations, ProfileMutation, graphene.ObjectType):
     pass
 
 schema = graphene.Schema(query=Query, mutation=Mutation)
