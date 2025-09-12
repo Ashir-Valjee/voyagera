@@ -9,4 +9,13 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
   },
+  server: {
+    proxy: {
+      // forwards http://localhost:5173/graphql -> http://127.0.0.1:8000/graphql
+      "/graphql": {
+        target: "http://127.0.0.1:8000",
+        changeOrigin: true,
+      },
+    },
+  },
 });
