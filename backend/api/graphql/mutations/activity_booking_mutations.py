@@ -83,7 +83,6 @@ class DeleteActivityBookingMutation(graphene.Mutation):
         activity_booking.delete()
 
         return DeleteActivityBookingMutation(
-            activity_booking=activity_booking, 
             success=True,
             errors=[]
         )

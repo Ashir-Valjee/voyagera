@@ -78,8 +78,26 @@ class UpdateFlightBookingMutation(graphene.Mutation):
             success=True,
             errors=[]
         )
-
+class DeleteFlightBookingMutation(graphene.Mutation):
+    flight_booking = graphene.Field(FlightBookingType)
+    success = graphene.Boolean()
+    errors = graphene.List(graphene.String)
+    
+    class Arguments:
+        id = graphene.ID(required=True)
+        
+    @classmethod
+    def mutate(cls, root, info, **kwargs):
+        require_user(info)
+        flight_booking =FlightBooking.objects.get(pk=kwargs.get("id"))
+        flight_booking.delete()
+        
+        return DeleteFlightBookingMutation(
+            success=True,
+            errors=[]
+        )
 
 class FlightBookingMutations(graphene.ObjectType):
     create_flight_booking = CreateFlightBookingMutation.Field()
     update_flight_booking = UpdateFlightBookingMutation.Field()
+    delete_flight_booking = DeleteFlightBookingMutation.Field()
