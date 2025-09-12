@@ -1,15 +1,15 @@
 import random
 from datetime import timedelta
 from decimal import Decimal
+
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-from django.db import transaction
+from django.db import transaction, connection
 
 from faker import Faker
 
 from api.models import City, Profile, FlightBooking, ActivityBooking
-
 
 # ----------------------------
 # 200 cities (city, country)
@@ -235,15 +235,11 @@ CITY_DATA = [
     ("Christchurch", "New Zealand"),
 ]
 
-
 CATEGORIES = ["MUSEUM", "FOOD", "SPORT", "FAMILY", "ARTS", "FILM"]
 
 
 def iata_for(city_obj) -> str:
-    """
-    Derive a simple 'airport code' from a city name: first 3 letters (letters only).
-    Good enough for seed data without maintaining a real IATA list.
-    """
+    """Derive a simple seed 'airport code' from the city name."""
     letters = "".join(ch for ch in city_obj.city if ch.isalpha())
     return (letters[:3] or "XXX").upper()
 
@@ -252,12 +248,38 @@ def _rand_bool(p_true=0.5) -> bool:
     return random.random() < p_true
 
 
+def truncate_and_restart(*models, keep_cities: bool = False):
+    """
+    TRUNCATE TABLE ... RESTART IDENTITY CASCADE for the given models.
+    If keep_cities is True, the City table is excluded from truncation.
+    """
+    tables = [m._meta.db_table for m in models]
+    if keep_cities:
+        city_table = City._meta.db_table
+        tables = [t for t in tables if t != city_table]
+    if not tables:
+        return
+    sql = "TRUNCATE TABLE {} RESTART IDENTITY CASCADE;".format(
+        ", ".join([f'"{t}"' for t in tables])
+    )
+    with connection.cursor() as cur:
+        cur.execute(sql)
+
+
 class Command(BaseCommand):
     help = "Seed the database with Cities, Users, Profiles, FlightBookings, and ActivityBookings."
 
     def add_arguments(self, parser):
-        parser.add_argument("--fresh", action="store_true",
-                            help="Delete existing seed data before seeding.")
+        parser.add_argument(
+            "--fresh",
+            action="store_true",
+            help="Truncate seed tables and reset IDs before seeding.",
+        )
+        parser.add_argument(
+            "--reset-users",
+            action="store_true",
+            help="Also TRUNCATE auth_user (resets user IDs).",
+        )
         parser.add_argument("--users", type=int, default=10,
                             help="How many users to create (default: 10)")
         parser.add_argument("--bookings-per-user", type=int, default=3,
@@ -277,20 +299,18 @@ class Command(BaseCommand):
         activities_per_booking = opts["activities_per_booking"]
         fresh = opts["fresh"]
         keep_cities = opts["keep_cities"]
+        reset_users = opts["reset_users"]
 
         self.stdout.write(self.style.SUCCESS("Seeding database..."))
 
-        # --------- Clear data if requested ----------
+        # --------- Fresh start: truncate and reset identities ----------
         if fresh:
-            self.stdout.write("Clearing old data...")
-            ActivityBooking.objects.all().delete()
-            FlightBooking.objects.all().delete()
-            Profile.objects.all().delete()
-            # keep superusers; delete normal users
-            User.objects.filter(is_superuser=False).delete()
-            if not keep_cities:
-                City.objects.all().delete()
-            self.stdout.write(self.style.SUCCESS("Old data cleared."))
+            self.stdout.write("Truncating seed tables and resetting identities...")
+            models_to_truncate = [ActivityBooking, FlightBooking, Profile, City]
+            if reset_users:
+                models_to_truncate.append(User)  # this truncates auth_user too
+            truncate_and_restart(*models_to_truncate, keep_cities=keep_cities)
+            self.stdout.write(self.style.SUCCESS("Tables truncated and sequences reset."))
 
         # --------- Seed Cities ----------
         self.stdout.write("Creating cities...")
@@ -330,9 +350,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"Users + profiles ready: {len(users)}"))
 
         # --------- Create Flight Bookings ----------
-        self.stdout.write(
-            f"Creating {bookings_per_user} flight bookings per user..."
-        )
+        self.stdout.write(f"Creating {bookings_per_user} flight bookings per user...")
         all_bookings = []
         for user in users:
             for _ in range(bookings_per_user):
@@ -355,12 +373,12 @@ class Command(BaseCommand):
                     user=user,
                     departure_city=dep,
                     destination_city=dest,
-                    departure_airport=dep_iata,       # stores fine in CharField(255)
-                    destination_airport=dest_iata,    # stores fine in CharField(255)
+                    departure_airport=dep_iata,       # CharField
+                    destination_airport=dest_iata,    # CharField
                     departure_date_time=depart_at,
                     arrival_date_time=arrival_at,
                     flight_duration=Decimal(str(round(duration_hours + duration_minutes / 60, 2))),
-                    number_of_stops=random.choice([0, 0, 0, 1, 1, 2]),  # skewed to direct/1-stop
+                    number_of_stops=random.choice([0, 0, 0, 1, 1, 2]),
                     number_of_passengers=random.randint(1, 3),
                     total_price=Decimal(str(round(random.uniform(60, 650), 2))),
                 )
@@ -369,9 +387,7 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"Flight bookings created: {len(all_bookings)}"))
 
         # --------- Create Activity Bookings ----------
-        self.stdout.write(
-            f"Creating {activities_per_booking} activities per booking..."
-        )
+        self.stdout.write(f"Creating {activities_per_booking} activities per booking...")
         act_total = 0
         for fb in all_bookings:
             for _ in range(activities_per_booking):
@@ -386,7 +402,6 @@ class Command(BaseCommand):
                     number_of_people=random.randint(1, fb.number_of_passengers),
                     category=cat,
                     activity_name=act_name,
-                    # If your model uses CharField for activity_url, ensure it has max_length in the model.
                     activity_url=f"https://example.com/activities/{cat.lower()}/{fake.lexify(text='????????')}",
                     total_price=Decimal(str(round(random.uniform(10, 120), 2))),
                 )

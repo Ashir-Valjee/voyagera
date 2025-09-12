@@ -57,7 +57,6 @@ class DeleteActivityBookingMutation(graphene.Mutation):
         require_user(info)
         activity_booking = ActivityBooking.objects.get(pk=kwargs.get("id"))
         activity_booking.delete()
-        require_user(info)
 
         return DeleteActivityBookingMutation(
             activity_booking=activity_booking, 
