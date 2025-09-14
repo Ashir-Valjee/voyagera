@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import LoginForm from './LoginForm';
 
 const NavBar = () => {
     return (
@@ -8,7 +9,18 @@ const NavBar = () => {
             </div>
             
             <div className="navbar-end">
-                <a className="btn btn-ghost">Sign In</a>
+                <button className="btn btn-ghost" onClick={()=>document.getElementById('my_modal_5').showModal()}>Sign In</button>
+                <dialog id="my_modal_5" className="modal modal-bottom sm:modal-middle">
+                <div className="modal-box">
+                    <LoginForm />
+                    <div className="modal-action">
+                    <form method="dialog">
+                        <button className="btn">Close</button>
+                    </form>
+                    </div>
+                </div>
+                </dialog>
+
                 <Link to="/signup" className="btn btn-primary">Sign Up</Link>
             </div>
         </div>
