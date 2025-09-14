@@ -5,7 +5,7 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./style.css";
 import App from "./App";
 import HomePage from "./pages/HomePage.jsx"
-import SignupLogin from "./pages/SignupLogin.jsx"
+import SignupPage from "./pages/SignupPage.jsx"
 import Results from "./pages/Results.jsx";
 import Profile from "./pages/Profile.jsx"
 import ErrorPage from "./pages/ErrorPage.jsx";
@@ -22,7 +22,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/signup",
-        element: <SignupLogin />, 
+        element: <SignupPage />, 
       },
       {
         path: "/results",
