@@ -1,15 +1,22 @@
-import "./App.css";
-import LoginForm from "./components/LoginForm";
-import SignupForm from "./components/SignUp";
+import { Outlet, useNavigation } from 'react-router-dom'
 
 function App() {
+  const navigation = useNavigation()
+
   return (
     <>
-      <p className="text-lg text-red-500">
-        Click on the Vite and React logos to learn more
-      </p>
-      <LoginForm />
-      <SignupForm />
+      <div>
+        <main>
+          {
+            navigation.state === "idle" ?
+            <Outlet />
+            :
+            <div>
+              <p>Loading...</p>
+            </div>
+          }
+        </main>
+      </div>
     </>
   );
 }
