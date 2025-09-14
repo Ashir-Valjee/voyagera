@@ -1,5 +1,6 @@
 import { Outlet, useNavigation } from 'react-router-dom'
 import NavBar from './components/NavBar';
+import Footer from './components/Footer';
 
 function App() {
   const navigation = useNavigation()
@@ -18,6 +19,7 @@ function App() {
             </div>
           }
         </main>
+        <Footer />
       </div>
     </>
   );
