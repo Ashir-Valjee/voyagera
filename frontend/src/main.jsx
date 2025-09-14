@@ -8,11 +8,13 @@ import HomePage from "./pages/HomePage.jsx"
 import SignupLogin from "./pages/SignupLogin.jsx"
 import Results from "./pages/Results.jsx";
 import Profile from "./pages/Profile.jsx"
+import ErrorPage from "./pages/ErrorPage.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,
@@ -33,7 +35,6 @@ const router = createBrowserRouter([
     ]
   },
 ]);
-
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <StrictMode>

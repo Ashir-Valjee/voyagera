@@ -15,7 +15,7 @@ function App() {
             <Outlet />
             :
             <div>
-              <p>Loading...</p>
+              <span className="loading loading-ring loading-xl loading-primary"></span>
             </div>
           }
         </main>
