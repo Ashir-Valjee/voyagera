@@ -1,4 +1,5 @@
 import { Outlet, useNavigation } from 'react-router-dom'
+import NavBar from './components/NavBar';
 
 function App() {
   const navigation = useNavigation()
@@ -6,6 +7,7 @@ function App() {
   return (
     <>
       <div>
+        <NavBar />
         <main>
           {
             navigation.state === "idle" ?
