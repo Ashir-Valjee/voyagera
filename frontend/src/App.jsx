@@ -7,9 +7,9 @@ function App() {
 
   return (
     <>
-      <div>
+      <div className="flex flex-col min-h-screen">
         <NavBar />
-        <main>
+        <main className="flex-grow">
           {
             navigation.state === "idle" ?
             <Outlet />
