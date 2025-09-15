@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 export const SingleActivityBooking = gql`
     query GetSingleActivityBooking($id: Int!) {
-        singleActivityBooking(Id: $id) {
+        singleActivityBooking(id: $id) {
             id
             dateCreated
             activityDateTime
@@ -17,7 +17,7 @@ export const SingleActivityBooking = gql`
 
 export const ActivityBookingByFlight = gql`
     query GetActivityBookingsByFlightId($flightBookingId: Int!){
-        activityBookingByFlightId((flightBookingId: $flightBookingId){
+        activityBookingByFlightId(flightBookingId: $flightBookingId){
             id
             dateCreated
             activityDateTime
@@ -28,4 +28,13 @@ export const ActivityBookingByFlight = gql`
             totalPrice
         }
     }
+`;
+
+export const LOGIN = gql`
+  mutation Login($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
+      access
+      refresh
+    }
+  }
 `;
