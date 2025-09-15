@@ -22,7 +22,7 @@ const HeroSection = () => {
                 </p>
                 
                 {/* Search Card */}
-                <div className="card bg-base-100 shadow-xl">
+                <div className="card bg-base-100 shadow-xl text-base-content">
                     <div className="card-body">
                         <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">

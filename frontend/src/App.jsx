@@ -14,7 +14,7 @@ function App() {
             navigation.state === "idle" ?
             <Outlet />
             :
-            <div>
+            <div className="flex h-full items-center justify-center">
               <span className="loading loading-ring loading-xl loading-primary"></span>
             </div>
           }
