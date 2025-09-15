@@ -1,10 +1,7 @@
-
-import HeroSection from '../components/HeroSection'
+import FlightSearch from "../components/FlightSearch";
 
 const HomePage = () => {
-    return (
-        <HeroSection />
-    )
-}
+  return <FlightSearch />;
+};
 
 export default HomePage;
