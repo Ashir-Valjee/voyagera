@@ -1,6 +1,6 @@
 import { apollo } from "../lib/apollo";
-import { SingleActivityBooking } from "./gql/activity_booking";
-import { ActivityBookingByFlight } from "./gql/activity_booking";
+import { SingleActivityBooking, ActivityBookingByFlight, CreateActivityBooking, DeleteActivityBooking, UpdateActivityBooking } from "./gql/activity_booking";
+
 
 export async function fetchSingleActivityBooking(id) {
     const { data } = await apollo.query({
@@ -18,4 +18,46 @@ export async function fetchActivityBookingByFlight(flightBookingId) {
         fetchPolicy: "network-only",
     });
     return data?.activityBookingByFlightId ?? null;
+}
+
+export async function createActivityBooking(
+  activityDateTime,
+  locationCityId,
+  numberOfPeople,
+  category,
+  activityName,
+  activityUrl,
+  totalPrice,
+  flightBookingId
+) {
+  const { data } = await apollo.mutate({
+    mutation: CreateActivityBooking,
+    variables: {
+      activityDateTime,
+      locationCityId,
+      numberOfPeople,
+      category,
+      activityName,
+      activityUrl,
+      totalPrice,
+      flightBookingId,
+    },
+  });
+  return data?.createActivityBooking ?? null;
+}
+
+export async function updateActivityBooking(id, numberOfPeople, totalPrice) {
+  const { data } = await apollo.mutate({
+    mutation: UpdateActivityBooking,
+    variables: { id, numberOfPeople, totalPrice },
+  });
+  return data?.updateActivityBooking ?? null;
+}
+
+export async function deleteActivityBooking(id) {
+  const { data } = await apollo.mutate({
+    mutation: DeleteActivityBooking,
+    variables: { id },
+  });
+  return data?.deleteActivityBooking ?? null;
 }
