@@ -88,13 +88,13 @@ export const UpdateActivityBooking = gql`
       numberOfPeople: $numberOfPeople
       totalPrice: $totalPrice
     ) {
+      success
+      errors
       activityBooking {
         id
         numberOfPeople
         totalPrice
       }
-      success
-      errors
     }
   }
 `;
