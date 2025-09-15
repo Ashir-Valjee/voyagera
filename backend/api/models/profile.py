@@ -9,7 +9,7 @@ class Profile(models.Model):
         related_name="profile",
     )
 
-    profile_pic_url = models.URLField(blank=True, default="https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png")
+    profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, default="profile_pics/Portrait_Placeholder.png")
 
     home_city = models.ForeignKey( 
         City,

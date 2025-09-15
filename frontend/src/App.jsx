@@ -1,15 +1,26 @@
-import "./App.css";
-import LoginForm from "./components/LoginForm";
-import SignupForm from "./components/SignUp";
+import { Outlet, useNavigation } from 'react-router-dom'
+import NavBar from './components/NavBar';
+import Footer from './components/Footer';
 
 function App() {
+  const navigation = useNavigation()
+
   return (
     <>
-      <p className="text-lg text-red-500">
-        Click on the Vite and React logos to learn more
-      </p>
-      <LoginForm />
-      <SignupForm />
+      <div className="flex flex-col min-h-screen">
+        <NavBar />
+        <main className="flex-grow">
+          {
+            navigation.state === "idle" ?
+            <Outlet />
+            :
+            <div className="flex h-full items-center justify-center">
+              <span className="loading loading-ring loading-xl loading-primary"></span>
+            </div>
+          }
+        </main>
+        <Footer />
+      </div>
     </>
   );
 }
