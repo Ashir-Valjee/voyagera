@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function FlightSearchPage() {
-  const [origin, setOrigin] = useState("JFK");
-  const [destination, setDestination] = useState("CDG");
-  const [departureDate, setDepartureDate] = useState("2025-11-02");
-  const [returnDate, setReturnDate] = useState("2025-11-10");
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
+  const [departureDate, setDepartureDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
   const [adults, setAdults] = useState(1);
   const [nonStop, setNonStop] = useState(false);
 
@@ -13,7 +13,7 @@ export default function FlightSearchPage() {
 
   function onSubmit(e) {
     e.preventDefault();
-    // keep params in URL so the results page can fetch & the URL is shareable
+
     const params = new URLSearchParams({
       origin: origin.trim().toUpperCase(),
       destination: destination.trim().toUpperCase(),
@@ -26,9 +26,7 @@ export default function FlightSearchPage() {
   }
 
   return (
-    <section className="max-w-2xl space-y-4">
-      <h1 className="text-3xl font-bold">Search flights</h1>
-
+    <section className="max-w-2xl space-y-4 bg-base-100">
       <form onSubmit={onSubmit} className="space-y-4">
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Route</legend>
@@ -66,9 +64,6 @@ export default function FlightSearchPage() {
               onChange={(e) => setReturnDate(e.target.value)}
             />
           </div>
-          <p className="label">
-            Return date is optional (leave blank for one-way)
-          </p>
         </fieldset>
 
         <div className="grid grid-cols-2 gap-3">

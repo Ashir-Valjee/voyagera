@@ -1,4 +1,4 @@
-import client from "../gql/client";
+import { apollo } from "../lib/apollo";
 import { AMADEUS_FLIGHT_OFFERS } from "./gql/flights";
 
 //  * params:
@@ -10,7 +10,7 @@ export async function searchFlights(params) {
     returnDate: params.returnDate || null,
   };
 
-  const { data } = await client.query({
+  const { data } = await apollo.query({
     query: AMADEUS_FLIGHT_OFFERS,
     variables,
     fetchPolicy: "no-cache",
