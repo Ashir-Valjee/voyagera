@@ -8,6 +8,8 @@ class ProfileType(DjangoObjectType):
             "id",
             "profile_pic",
             "home_city",
+            "first_name",
+            "last_name",
             "likes_music",
             "likes_sports",
             "likes_arts",

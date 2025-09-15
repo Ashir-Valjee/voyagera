@@ -22,10 +22,13 @@ class UpdateProfileMutation(graphene.Mutation):
         likes_arts = graphene.Boolean(required=True)
         likes_film = graphene.Boolean(required=True)
         likes_family = graphene.Boolean(required=True)
+        first_name = graphene.String(required=True)
+        last_name = graphene.String(required=True)
 
     @classmethod
     def mutate(cls, root, info, **kwargs):
         user = require_user(info)
+
         profile = Profile.objects.get(user=user)
         home_city = City.objects.get(pk=kwargs.get("home_city_id"))
 
@@ -35,6 +38,9 @@ class UpdateProfileMutation(graphene.Mutation):
         profile.likes_film = kwargs.get("likes_film")
         profile.likes_family = kwargs.get("likes_family")
         profile.home_city = home_city
+        profile.first_name = kwargs.get("first_name")
+        profile.last_name = kwargs.get("last_name")
+        
         profile_pic = kwargs.get("profile_pic")
         if profile_pic:
                 profile.profile_pic = profile_pic
