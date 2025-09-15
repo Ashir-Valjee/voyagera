@@ -2,8 +2,9 @@ import { gql } from "@apollo/client";
 
 export const Profile = gql`
   query GetProfile{
-     getUserProfile {
+    getUserProfile {
         id
+        profilePic
         likesMusic
         likesSports
         likesArts
@@ -18,22 +19,20 @@ export const Profile = gql`
 
 export const UpdateProfile = gql`
   mutation UpdateProfile(
-    $id: ID!
-    $firstName: String!
-    $lastName: String!
-    $profilePicUrl: String!
-    $homeCityId: ID!
-    $likesMusic: Boolean!
-    $likesSports: Boolean!
-    $likesArts: Boolean!
-    $likesFilm: Boolean!
-    $likesFamily: Boolean!
+    $firstName: String
+    $lastName: String
+    $profilePic: Upload
+    $homeCityId: ID
+    $likesMusic: Boolean
+    $likesSports: Boolean
+    $likesArts: Boolean
+    $likesFilm: Boolean
+    $likesFamily: Boolean
   ) {
     updateProfile(
-      id: $id
       firstName: $firstName
       lastName: $lastName
-      profilePicUrl: $profilePicUrl
+      profilePic: $profilePic
       homeCityId: $homeCityId
       likesMusic: $likesMusic
       likesSports: $likesSports
@@ -52,7 +51,7 @@ export const UpdateProfile = gql`
         likesFamily
         firstName
         lastName
-        profilePicUrl
+        profilePic
       }
     }
   }

@@ -6,7 +6,20 @@ import {
   ApolloLink,
 } from "@apollo/client";
 
-const httpLink = new HttpLink({ uri: "/graphql/" });
+// Custom fetch to support file uploads
+const customFetch = (uri, options) => {
+  // If the body is FormData, don't stringify
+  if (options.body instanceof FormData) {
+    // Remove content-type so browser sets it (with boundary)
+    delete options.headers["content-type"];
+  }
+  return fetch(uri, options);
+};
+
+const httpLink = new HttpLink({ 
+  uri: "/graphql/",
+  fetch: customFetch,
+});
 
 const authLink = new ApolloLink((operation, forward) => {
   const token = localStorage.getItem("access");

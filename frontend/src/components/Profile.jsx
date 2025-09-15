@@ -1,32 +1,32 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import PlaceholderImage from "../assets/Portrait_Placeholder.png"
 
 const Profile = ({ initialProfile, cities = [], onUpdate }) => {
     const [profile, setProfile] = useState(initialProfile || {
-        profile_pic: null,
-        home_city: null,
-        likes_music: false,
-        likes_sports: false,
-        likes_arts: false,
-        likes_film: false,
-        likes_family: false,
+        id: null,
+        firstName: '',
+        lastName: '',
+        profilePic: null,
+        homeCityId: null,
+        likesMusic: false,
+        likesSports: false,
+        likesArts: false,
+        likesFilm: false,
+        likesFamily: false,
     });
-    
-    //   const [isLoading, setIsLoading] = useState(false);
 
-    //   const handleInputChange = (field, value) => {
-    //     setProfile(prev => ({
-    //       ...prev,
-    //       [field]: value
-    //     }));
-    //   };
+    useEffect(() => {
+        if (initialProfile) {
+            setProfile(initialProfile);
+        }
+    }, [initialProfile]);
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file) {
-        const updatedProfile = { ...profile, profile_pic: file };
+            const updatedProfile = { ...profile, profilePic: file };
         setProfile(updatedProfile);
-        handleAutoSave('profile_pic', file);
+        handleAutoSave('profilePic', file);
         }
     };
 
@@ -39,18 +39,28 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
         setProfile(updatedProfile);
         
         try {
-        await onUpdate?.(updatedProfile);
+        const result = await onUpdate?.(updatedProfile);
+        
+        // If the update was successful and returned a profile, use that data
+        if (result && result.profile) {
+            setProfile(prevProfile => ({
+                ...prevProfile,
+                ...result.profile
+            }));
+        }
         } catch (error) {
-        console.error('Failed to update profile:', error);
+            console.error('Failed to update profile:', error);
+            // Revert the local change if the server update failed
+            setProfile(profile);
         }
     };
 
     const interests = [
-        { key: 'likes_music', label: '🎵 Music', icon: '🎵' },
-        { key: 'likes_sports', label: '⚽ Sports', icon: '⚽' },
-        { key: 'likes_arts', label: '🎨 Arts', icon: '🎨' },
-        { key: 'likes_film', label: '🎬 Film', icon: '🎬' },
-        { key: 'likes_family', label: '👨‍👩‍👧‍👦 Family', icon: '👨‍👩‍👧‍👦' },
+        { key: 'likesMusic', label: '🎵 Music', icon: '🎵' },
+        { key: 'likesSports', label: '⚽ Sports', icon: '⚽' },
+        { key: 'likesArts', label: '🎨 Arts', icon: '🎨' },
+        { key: 'likesFilm', label: '🎬 Film', icon: '🎬' },
+        { key: 'likesFamily', label: '👨‍👩‍👧‍👦 Family', icon: '👨‍👩‍👧‍👦' },
     ];
 
     return (
@@ -65,12 +75,15 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
                 <div className="relative">
                     <div className="avatar">
                         <div className="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
-                            <img 
-                            src={profile.profile_pic ? 
-                                (typeof profile.profile_pic === 'string' ? profile.profile_pic : URL.createObjectURL(profile.profile_pic)) 
-                                : PlaceholderImage
-                            } 
-                            alt="Profile"
+                            <img
+                                src={
+                                    profile.profilePicUrl
+                                        ? profile.profilePicUrl
+                                        : profile.profilePic instanceof File
+                                            ? URL.createObjectURL(profile.profilePic)
+                                            : PlaceholderImage
+                                }
+                                alt="Profile"
                             />
                         </div>
                     </div>
@@ -107,10 +120,10 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
                 </label>
                 <select 
                 className="select select-bordered w-full mt-4"
-                value={profile.home_city?.id || ''}
+                value={profile.homeCity?.id || ''}
                 onChange={(e) => {
                     const selectedCity = cities.find(city => city.id === e.target.value);
-                    handleAutoSave('home_city', selectedCity);
+                    handleAutoSave('homeCity', selectedCity);
                 }}
                 >
                 <option value="">Select a city</option>
@@ -144,7 +157,8 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
                 ))}
                 </div>
             </div>
-            {/*Booked Flights*/}
+
+            {/* Booked Flights */}
             <div className="divider"></div>
             <h3 className="text-xl font-semibold text-center mt-4">My Flight Bookings ✈️</h3>
             
@@ -154,7 +168,7 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
                         <div key={booking.id} className="collapse collapse-arrow bg-base-200">
                             <input type="radio" name="booking-accordion" /> 
                             <div className="collapse-title text-md font-medium">
-                                {booking.departureCity.city} to {booking.destinationCity.city}
+                                {booking.departureCity?.city} to {booking.destinationCity?.city}
                             </div>
                             <div className="collapse-content"> 
                                 <p><strong>Date:</strong> {new Date(booking.departureDateTime).toLocaleDateString()}</p>

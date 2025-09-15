@@ -1,7 +1,11 @@
+
+import graphene
 from graphene_django import DjangoObjectType
 from api.models import Profile
 
 class ProfileType(DjangoObjectType):
+    profilePicUrl = graphene.String()
+
     class Meta:
         model = Profile
         fields = (
@@ -16,3 +20,8 @@ class ProfileType(DjangoObjectType):
             "likes_film",
             "likes_family",
         )
+
+    def resolve_profilePicUrl(self, info):
+        if self.profile_pic:
+            return self.profile_pic.url
+        return None

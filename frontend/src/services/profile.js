@@ -14,5 +14,5 @@ export async function updateUserProfile(profileInfo) {
     mutation: UpdateProfile,
     variables:profileInfo,
   });
-   return data?.updateProfile ?? null
+  return data?.updateProfile ?? null
 }
