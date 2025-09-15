@@ -15,9 +15,9 @@ export const SingleActivityBooking = gql`
     }
 `;
 
-export const ActivityBookingByFlight = gql`
+export const ActivityBookingsByFlight = gql`
   query GetActivityBookingsByFlightId($flightBookingId: Int!){
-    activityBookingByFlightId(flightBookingId: $flightBookingId){
+    activityBookingsByFlightId(flightBookingId: $flightBookingId){
         id
         dateCreated
         activityDateTime
@@ -95,6 +95,7 @@ export const UpdateActivityBooking = gql`
         numberOfPeople
         totalPrice
       }
+
     }
   }
 `;
