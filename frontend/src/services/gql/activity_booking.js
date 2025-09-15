@@ -30,6 +30,28 @@ export const ActivityBookingsByFlight = gql`
   }
 `;
 
+export const ActivityBookingsByUser = gql`
+  query ActivityBookingsByUser {
+    activityBookingsByUser {
+        id
+        activityDateTime
+        numberOfPeople
+        category
+        activityName
+        activityUrl
+        totalPrice
+        flightBooking {
+            id
+            destinationCity {
+                id
+                country
+                city
+            }
+        }
+    }
+  }
+`;
+
 export const CreateActivityBooking = gql`
   mutation CreateActivityBooking(
     $activityDateTime: DateTime!

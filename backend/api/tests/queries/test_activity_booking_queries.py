@@ -131,7 +131,7 @@ def test_sinle_activity_booking_queries(client):
     assert "singleActivityBooking" in content["data"]
 
 @pytest.mark.django_db
-def test_get_activities_by_user(client):
+def test_get_activity_bookings_by_user(client):
     user1 = User.objects.create_user(username="user1@test.com", password="password")
     client.force_login(user1)
 
@@ -175,24 +175,24 @@ def test_get_activities_by_user(client):
     )
 
     query ='''
-    query ActivitiesByUser {
-    activitiesByUser {
-        id
-        activityDateTime
-        numberOfPeople
-        category
-        activityName
-        activityUrl
-        totalPrice
-        flightBooking {
+    query ActivityBookingsByUser {
+        activityBookingsByUser {
             id
-            destinationCity {
+            activityDateTime
+            numberOfPeople
+            category
+            activityName
+            activityUrl
+            totalPrice
+            flightBooking {
                 id
-                country
-                city
+                destinationCity {
+                    id
+                    country
+                    city
+                }
             }
         }
-    }
 }
 '''
 
@@ -204,9 +204,9 @@ def test_get_activities_by_user(client):
 
     content = json.loads(response.content)
 
-    activities = content["data"]["activitiesByUser"]
+    activities = content["data"]["activityBookingsByUser"]
 
     assert "errors" not in content
-    assert "activitiesByUser" in content["data"]
+    assert "activityBookingsByUser" in content["data"]
     assert activities[0]["flightBooking"]["destinationCity"]["city"] == "DestCity"
     assert len(activities) == 2

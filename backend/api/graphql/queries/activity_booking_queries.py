@@ -16,7 +16,7 @@ class ActivityBookingQueries(graphene.ObjectType):
         id = graphene.Int(required=True)
     )
     
-    activities_by_user = graphene.List(
+    activity_bookings_by_user = graphene.List(
         ActivityBookingType
     )
 
@@ -35,7 +35,7 @@ class ActivityBookingQueries(graphene.ObjectType):
             raise GraphQLError("no activities found")
         return activity
     
-    def resolve_activities_by_user(self, info):
+    def resolve_activity_bookings_by_user(self, info):
         user = require_user(info)
         activity = ActivityBooking.objects.filter(flight_booking__user=user)
         if not activity:
