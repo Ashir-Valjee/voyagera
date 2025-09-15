@@ -1,4 +1,3 @@
-// src/components/FlightCard.jsx
 import { toYMD, formatIsoToYMDHM } from "../utils/dates";
 
 export default function FlightCard({ offer, onSelect }) {
@@ -9,14 +8,10 @@ export default function FlightCard({ offer, onSelect }) {
 
   return (
     <li className="list-row">
-      {/* left icon / avatar */}
       <div>
-        <div className="size-10 rounded-box bg-base-200 grid place-items-center text-xs font-semibold">
-          {offer.outDepartureIata}
-        </div>
+        <img className="size-10 rounded-box" src="plane-logo.jpg" />
       </div>
 
-      {/* main content */}
       <div className="min-w-0">
         <div className="flex items-baseline gap-2">
           <div className="truncate font-medium">
@@ -43,7 +38,7 @@ export default function FlightCard({ offer, onSelect }) {
             </>
           )}
           {offer.outStops !== null && offer.outStops !== undefined && (
-            <> · {offer.outStops} stop(s)</>
+            <> · {offer.outStops} stop</>
           )}
         </div>
 
@@ -59,7 +54,7 @@ export default function FlightCard({ offer, onSelect }) {
               </>
             )}
             {offer.retStops !== null && offer.retStops !== undefined && (
-              <> · {offer.retStops} stop(s)</>
+              <> · {offer.retStops} stop</>
             )}
           </div>
         )}
