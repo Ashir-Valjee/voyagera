@@ -10,6 +10,7 @@ class Profile(models.Model):
     )
 
     profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, default="profile_pics/Portrait_Placeholder.png")
+    
 
     home_city = models.ForeignKey( 
         City,
@@ -17,6 +18,9 @@ class Profile(models.Model):
         blank = True,
         on_delete=models.PROTECT
     )
+
+    first_name = models.CharField(max_length=150, null=True, blank=True, default=None)
+    last_name = models.CharField(max_length=150, null=True, blank=True, default=None)
 
     likes_music = models.BooleanField(default=False)
     likes_sports = models.BooleanField(default=False)

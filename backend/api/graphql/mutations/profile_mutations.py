@@ -14,27 +14,43 @@ class UpdateProfileMutation(graphene.Mutation):
 
     class Arguments:
         id = graphene.ID(required=True)
-        profile_pic_url = graphene.String(required=True)
-        home_city_id = graphene.ID(required=True)
-        likes_music = graphene.Boolean(required=True)
-        likes_sports = graphene.Boolean(required=True)
-        likes_arts = graphene.Boolean(required=True)
-        likes_film = graphene.Boolean(required=True)
-        likes_family = graphene.Boolean(required=True)
+        profile_pic_url = graphene.String()
+        home_city_id = graphene.ID()
+        first_name = graphene.String()
+        last_name = graphene.String()
+        likes_music = graphene.Boolean()
+        likes_sports = graphene.Boolean()
+        likes_arts = graphene.Boolean()
+        likes_film = graphene.Boolean()
+        likes_family = graphene.Boolean()
 
     @classmethod
     def mutate(cls, root, info, **kwargs):
         user = require_user(info)
         profile = Profile.objects.get(pk=kwargs.get("id"),user=user)
-        home_city = City.objects.get(pk=kwargs.get("home_city_id"))
 
-        profile.likes_music = kwargs.get("likes_music")
-        profile.likes_sports = kwargs.get("likes_sports")
-        profile.likes_arts = kwargs.get("likes_arts")
-        profile.likes_film = kwargs.get("likes_film")
-        profile.likes_family = kwargs.get("likes_family")
-        profile.profile_pic_url = kwargs.get("profile_pic_url")
-        profile.home_city = home_city
+        if "first_name" in kwargs:
+            profile.first_name = kwargs["first_name"]
+        if "last_name" in kwargs:
+            profile.last_name = kwargs["last_name"]
+        if "likes_music" in kwargs:
+            profile.likes_music = kwargs["likes_music"]
+        if "likes_sports" in kwargs:
+            profile.likes_sports = kwargs["likes_sports"]
+        if "likes_arts" in kwargs:
+            profile.likes_arts = kwargs["likes_arts"]
+        if "likes_film" in kwargs:
+            profile.likes_film = kwargs["likes_film"]
+        if "likes_family" in kwargs:
+            profile.likes_family = kwargs["likes_family"]
+        if "profile_pic_url" in kwargs:
+            profile.profile_pic_url = kwargs["profile_pic_url"]
+        if "home_city_id" in kwargs:
+            try:
+                home_city = City.objects.get(pk=kwargs["home_city_id"])
+                profile.home_city = home_city
+            except City.DoesNotExist:
+                raise GraphQLError("Home city not found")
 
         profile.save()
 
