@@ -120,15 +120,15 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
                 </label>
                 <select 
                 className="select select-bordered w-full mt-4"
-                value={profile.homeCity?.id || ''}
+                value={String(profile.homeCity?.id || '')}
                 onChange={(e) => {
-                    const selectedCity = cities.find(city => city.id === e.target.value);
+                    const selectedCity = cities.find(city => String(city.id) === e.target.value);
                     handleAutoSave('homeCity', selectedCity);
                 }}
                 >
                 <option value="">Select a city</option>
                 {cities.map(city => (
-                    <option key={city.id} value={city.id}>
+                    <option key={city.id} value={String(city.id)}>
                     {city.city}
                     </option>
                 ))}
@@ -163,22 +163,36 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
             <h3 className="text-xl font-semibold text-center mt-4">My Flight Bookings ✈️</h3>
             
             <div className="space-y-2">
-                {initialProfile?.flightBookings?.length > 0 ? (
-                    initialProfile.flightBookings.map(booking => (
-                        <div key={booking.id} className="collapse collapse-arrow bg-base-200">
-                            <input type="radio" name="booking-accordion" /> 
-                            <div className="collapse-title text-md font-medium">
-                                {booking.departureCity?.city} to {booking.destinationCity?.city}
+                    {initialProfile?.flightBookings?.length > 0 ? (
+                        initialProfile.flightBookings.map(booking => (
+                            <div key={booking.id} className="card bg-base-200 shadow-md mb-8">
+                                <div className="card-header px-4 py-2 bg-primary text-primary-content rounded-t">
+                                    <h4 className="text-lg font-semibold">
+                                        {booking.departureCity?.city} to {booking.destinationCity?.city}
+                                    </h4>
+                                </div>
+                                <div className="card-body p-4">
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        <div>
+                                            <p><strong>Departure Airport:</strong> {booking.departureAirport}</p>
+                                            <p><strong>Departure Date & Time:</strong> {new Date(booking.departureDateTime).toLocaleString()}</p>
+                                            <p><strong>Arrival Airport:</strong> {booking.destinationAirport}</p>
+                                            <p><strong>Arrival Date & Time:</strong> {new Date(booking.arrivalDateTime).toLocaleString()}</p>
+                                        </div>
+                                        <div>
+                                            <p><strong>Flight Duration:</strong> {booking.flightDuration} hours</p>
+                                            <p><strong>Number of Stops:</strong> {booking.numberOfStops}</p>
+                                            <p><strong>Passengers:</strong> {booking.numberOfPassengers}</p>
+                                            <p><strong>Total Price:</strong> £{booking.totalPrice}</p>
+                                            <p><strong>Booked On:</strong> {new Date(booking.dateCreated).toLocaleDateString()}</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="collapse-content"> 
-                                <p><strong>Date:</strong> {new Date(booking.departureDateTime).toLocaleDateString()}</p>
-                                <p><strong>Flight Duration:</strong> {booking.flightDuration} hours</p>
-                            </div>
-                        </div>
-                    ))
-                ) : (
-                    <p className="text-center text-base-content/60">No flights booked yet.</p>
-                )}
+                        ))
+                    ) : (
+                        <p className="text-center text-base-content/60">No flights booked yet.</p>
+                    )}
             </div>
 
             </div>

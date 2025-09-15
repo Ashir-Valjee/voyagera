@@ -3,15 +3,20 @@ import { gql } from "@apollo/client";
 export const Profile = gql`
   query GetProfile{
     getUserProfile {
+      id
+      profilePic
+      likesMusic
+      likesSports
+      likesArts
+      likesFilm
+      likesFamily
+      firstName
+      lastName
+      homeCity {
         id
-        profilePic
-        likesMusic
-        likesSports
-        likesArts
-        likesFilm
-        likesFamily
-        firstName
-        lastName
+        city
+        country
+      }
     }
   }
 
@@ -52,6 +57,11 @@ export const UpdateProfile = gql`
         firstName
         lastName
         profilePic
+        homeCity {
+          id
+          city
+          country
+        }
       }
     }
   }

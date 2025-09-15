@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react';
 import Profile from "../components/Profile";
 import { fetchUserProfile, updateUserProfile } from "../services/profile";
 import { fetchFlightBookings } from "../services/flights";
+import { fetchCities } from "../services/city";
 
 const ProfilePage = () => {
     const [profile, setProfile] = useState(null);
+    const [cities, setCities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -12,13 +14,15 @@ const ProfilePage = () => {
     // Use Promise.all to run both fetches at the same time
     Promise.all([
         fetchUserProfile(),
-        fetchFlightBookings()
+        fetchFlightBookings(),
+        fetchCities()
     ])
-    .then(([profileData, flightBookingsData]) => {
+    .then(([profileData, flightBookingsData, citiesData]) => {
         setProfile({
             ...profileData,
             flightBookings: flightBookingsData || [], 
         });
+        setCities(citiesData || []);
     })
     .catch(err => {
         console.error("Failed to fetch profile data:", err);
@@ -78,7 +82,7 @@ const ProfilePage = () => {
             <div className="p-4 md:p-8">
                 <Profile
                     initialProfile={profile}
-                    // cities={...} 
+                    cities={cities} 
                     onUpdate={handleUpdate} 
                 />
             </div>
