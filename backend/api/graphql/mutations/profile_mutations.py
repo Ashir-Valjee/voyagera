@@ -5,6 +5,7 @@ from ...models import City
 from ..types.profile_type import ProfileType
 from graphql import GraphQLError
 from ..utils.auth import require_user
+from graphene_file_upload.scalars import Upload
 
 
 class UpdateProfileMutation(graphene.Mutation):
@@ -13,8 +14,8 @@ class UpdateProfileMutation(graphene.Mutation):
     errors = graphene.List(graphene.String)
 
     class Arguments:
-        id = graphene.ID(required=True)
-        profile_pic_url = graphene.String(required=True)
+        # id = graphene.ID(required=True)
+        profile_pic = Upload(required=False)
         home_city_id = graphene.ID(required=True)
         likes_music = graphene.Boolean(required=True)
         likes_sports = graphene.Boolean(required=True)
@@ -25,7 +26,7 @@ class UpdateProfileMutation(graphene.Mutation):
     @classmethod
     def mutate(cls, root, info, **kwargs):
         user = require_user(info)
-        profile = Profile.objects.get(pk=kwargs.get("id"),user=user)
+        profile = Profile.objects.get(user=user)
         home_city = City.objects.get(pk=kwargs.get("home_city_id"))
 
         profile.likes_music = kwargs.get("likes_music")
@@ -33,8 +34,10 @@ class UpdateProfileMutation(graphene.Mutation):
         profile.likes_arts = kwargs.get("likes_arts")
         profile.likes_film = kwargs.get("likes_film")
         profile.likes_family = kwargs.get("likes_family")
-        profile.profile_pic_url = kwargs.get("profile_pic_url")
         profile.home_city = home_city
+        profile_pic = kwargs.get("profile_pic")
+        if profile_pic:
+                profile.profile_pic = profile_pic
 
         profile.save()
 

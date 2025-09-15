@@ -6,7 +6,7 @@ class ProfileType(DjangoObjectType):
         model = Profile
         fields = (
             "id",
-            "profile_pic_url",
+            "profile_pic",
             "home_city",
             "likes_music",
             "likes_sports",

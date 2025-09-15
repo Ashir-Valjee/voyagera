@@ -20,11 +20,12 @@ from django.views.decorators.csrf import csrf_exempt
 from graphene_django.views import GraphQLView
 from api.schema import schema
 from api.graphql.middleware import JWTAuthMiddleware
+from graphene_file_upload.django import FileUploadGraphQLView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("graphql/", csrf_exempt(  # CSRF not needed for Bearer tokens
-        GraphQLView.as_view(
+        FileUploadGraphQLView.as_view(
             schema=schema, 
             graphiql=True, 
             middleware=[JWTAuthMiddleware()])
