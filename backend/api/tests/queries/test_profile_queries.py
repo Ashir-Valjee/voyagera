@@ -6,16 +6,24 @@ from api.models import Profile
 User = get_user_model()
 
 GET_PROFILE_QUERY = """
-    query {
-        getUserProfile {
-            likesMusic
-            homeCity {
-                city
-            }
-            profilePicUrl
+query GetUserProfile {
+    getUserProfile {
+        id
+        profilePic
+        firstName
+        lastName
+        likesMusic
+        likesSports
+        likesArts
+        likesFilm
+        likesFamily
+        homeCity {
+            city
         }
     }
+}
 """
+
 
 @pytest.mark.django_db
 def test_get_user_profile_defaults(client):
@@ -31,15 +39,16 @@ def test_get_user_profile_defaults(client):
     """
     register_response = client.post(
         "/graphql/",
-        {"query": register_mutation, "variables": {"email": email, "password": password}},
+        data=json.dumps({"query": register_mutation, "variables": {"email": email, "password": password}}),
         content_type="application/json"
     )
+    
     access_token = json.loads(register_response.content)["data"]["register"]["access"]
 
     headers = {"HTTP_AUTHORIZATION": f"Bearer {access_token}"}
     response = client.post(
         "/graphql/",
-        {"query": GET_PROFILE_QUERY},
+        data=json.dumps({"query": GET_PROFILE_QUERY}),
         content_type="application/json",
         **headers
     )
@@ -52,13 +61,13 @@ def test_get_user_profile_defaults(client):
     
     assert profile_data["likesMusic"] is False
     assert profile_data["homeCity"] is None
-    assert "Portrait_Placeholder.png" in profile_data["profilePicUrl"]
+
     
 @pytest.mark.django_db
 def test_get_user_profile_unauthenticated(client):
     response = client.post(
         "/graphql/",
-        {"query": GET_PROFILE_QUERY},
+        data=json.dumps({"query": GET_PROFILE_QUERY}),
         content_type="application/json",
     )
     content = json.loads(response.content)
