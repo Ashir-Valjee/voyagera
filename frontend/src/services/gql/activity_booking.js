@@ -1,31 +1,31 @@
 import { gql } from "@apollo/client";
 
 export const SingleActivityBooking = gql`
-    query GetSingleActivityBooking($id: Int!) {
-        singleActivityBooking(id: $id) {
-            id
-            dateCreated
-            activityDateTime
-            numberOfPeople
-            category
-            activityName
-            activityUrl
-            totalPrice
-        }
+  query GetSingleActivityBooking($id: Int!) {
+    singleActivityBooking(id: $id) {
+      id
+      dateCreated
+      activityDateTime
+      numberOfPeople
+      category
+      activityName
+      activityUrl
+      totalPrice
     }
+  }
 `;
 
 export const ActivityBookingByFlight = gql`
-  query GetActivityBookingsByFlightId($flightBookingId: Int!){
-    activityBookingByFlightId(flightBookingId: $flightBookingId){
-        id
-        dateCreated
-        activityDateTime
-        numberOfPeople
-        category
-        activityName
-        activityUrl
-        totalPrice
+  query GetActivityBookingsByFlightId($flightBookingId: Int!) {
+    activityBookingByFlightId(flightBookingId: $flightBookingId) {
+      id
+      dateCreated
+      activityDateTime
+      numberOfPeople
+      category
+      activityName
+      activityUrl
+      totalPrice
     }
   }
 `;
@@ -76,7 +76,6 @@ export const DeleteActivityBooking = gql`
   }
 `;
 
-
 export const UpdateActivityBooking = gql`
   mutation UpdateActivityBooking(
     $id: ID!
@@ -95,6 +94,33 @@ export const UpdateActivityBooking = gql`
         numberOfPeople
         totalPrice
       }
+    }
+  }
+`;
+
+export const TICKETMASTER_EVENTS = gql`
+  query TicketmasterEvents(
+    $city: String
+    $startDateTime: String
+    $endDateTime: String
+    $classificationName: String
+    $size: Int = 24
+  ) {
+    ticketmasterEvents(
+      city: $city
+      startDateTime: $startDateTime
+      endDateTime: $endDateTime
+      classificationName: $classificationName
+      size: $size
+    ) {
+      id
+      name
+      city
+      classificationName
+      startDateTime
+      country
+      imageUrl
+      eventUrl
     }
   }
 `;

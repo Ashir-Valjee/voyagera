@@ -17,3 +17,77 @@ export function stopLabel(n) {
   if (n == null) return null;
   return `${n} stop${n === 1 ? "" : "s"}`;
 }
+
+export function prettyWhen(s) {
+  if (!s) return "";
+
+  const d = new Date(s);
+  if (!isNaN(d)) {
+    return d.toLocaleString(undefined, {
+      weekday: "short",
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  }
+
+  try {
+    const [y, m, dd] = s.split("-");
+    return new Date(Number(y), Number(m) - 1, Number(dd)).toLocaleDateString(
+      undefined,
+      { weekday: "short", year: "numeric", month: "short", day: "numeric" }
+    );
+  } catch {
+    return s;
+  }
+}
+
+export function toUtcIso(dateStr, endOfDay = false) {
+  if (!dateStr) return null;
+  return endOfDay ? `${dateStr}T23:59:59Z` : `${dateStr}T00:00:00Z`;
+}
+
+export function pad(n) {
+  return String(n).padStart(2, "0");
+}
+export function ymdFromDate(d) {
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(
+    d.getUTCDate()
+  )}`;
+}
+export function dayStartZ(ymd) {
+  return `${ymd}T00:00:00Z`;
+}
+export function dayEndZ(ymd) {
+  return `${ymd}T23:59:59Z`;
+}
+export function addDaysYMD(ymd, days) {
+  const d = new Date(`${ymd}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return ymdFromDate(d);
+}
+
+export function isIataCode(s) {
+  return /^[A-Za-z]{3}$/.test(s || "");
+}
+
+export function resolveCityName(destinationParam, cities) {
+  if (!destinationParam) return null;
+  const destRaw = destinationParam.trim();
+  const destUpper = destRaw.toUpperCase();
+  const destLower = destRaw.toLowerCase();
+
+  if (isIataCode(destRaw)) {
+    const byIata = cities.find(
+      (c) => (c.iataCode || "").toUpperCase() === destUpper
+    );
+    if (byIata?.city) return byIata.city;
+  }
+
+  const byName = cities.find((c) => (c.city || "").toLowerCase() === destLower);
+  if (byName?.city) return byName.city;
+
+  return destRaw;
+}
