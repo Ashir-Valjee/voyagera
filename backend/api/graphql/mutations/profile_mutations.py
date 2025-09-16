@@ -5,6 +5,7 @@ from ...models import City
 from ..types.profile_type import ProfileType
 from graphql import GraphQLError
 from ..utils.auth import require_user
+from graphene_file_upload.scalars import Upload
 
 
 class UpdateProfileMutation(graphene.Mutation):
@@ -13,36 +14,43 @@ class UpdateProfileMutation(graphene.Mutation):
     errors = graphene.List(graphene.String)
 
     class Arguments:
-        id = graphene.ID(required=True)
-        profile_pic_url = graphene.String(required=True)
-        home_city_id = graphene.ID(required=True)
-        likes_music = graphene.Boolean(required=True)
-        likes_sports = graphene.Boolean(required=True)
-        likes_arts = graphene.Boolean(required=True)
-        likes_film = graphene.Boolean(required=True)
-        likes_family = graphene.Boolean(required=True)
+        # id = graphene.ID(required=True)
+        profile_pic = graphene.String(required=False)
+        home_city_id = graphene.ID(required=False)
+        likes_music = graphene.Boolean(required=False)
+        likes_sports = graphene.Boolean(required=False)
+        likes_arts = graphene.Boolean(required=False)
+        likes_film = graphene.Boolean(required=False)
+        likes_family = graphene.Boolean(required=False)
+        first_name = graphene.String(required=False)
+        last_name = graphene.String(required=False)
 
     @classmethod
     def mutate(cls, root, info, **kwargs):
         user = require_user(info)
-        profile = Profile.objects.get(pk=kwargs.get("id"),user=user)
-        home_city = City.objects.get(pk=kwargs.get("home_city_id"))
+        
+        try:
+            profile = Profile.objects.get(user=user)
 
-        profile.likes_music = kwargs.get("likes_music")
-        profile.likes_sports = kwargs.get("likes_sports")
-        profile.likes_arts = kwargs.get("likes_arts")
-        profile.likes_film = kwargs.get("likes_film")
-        profile.likes_family = kwargs.get("likes_family")
-        profile.profile_pic_url = kwargs.get("profile_pic_url")
-        profile.home_city = home_city
+            # Update all fields on the Profile model
+            if 'home_city_id' in kwargs:
+                profile.home_city = City.objects.get(pk=kwargs.get('home_city_id'))
+            
+            # It loops through any other arguments provided in the mutation.
+            for field in ['first_name', 'last_name', 'likes_music', 'likes_sports', 'likes_arts', 'likes_film', 'likes_family']:
+                if field in kwargs:
+                    setattr(profile, field, kwargs.get(field))
 
-        profile.save()
+            # Handle the optional file upload separately
+            if 'profile_pic' in kwargs:
+                profile.profile_pic = kwargs.get('profile_pic')
+            
+            profile.save() 
 
-        return UpdateProfileMutation(
-            profile=profile,
-            success=True,
-            errors=[]
-        )
+            return UpdateProfileMutation(profile=profile, success=True)
+        
+        except (Profile.DoesNotExist, City.DoesNotExist):
+            return UpdateProfileMutation(success=False, errors=["Profile or City not found."])
 
 
 class ProfileMutation(graphene.ObjectType):
