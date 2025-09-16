@@ -1,4 +1,6 @@
 import HeroBackground from "../assets/landscape.jpg"
+import './HeroSection.css';
+
 
 const HeroSection = () => {
     return (
@@ -7,7 +9,7 @@ const HeroSection = () => {
             <img 
             src={HeroBackground} 
             alt="Beautiful tropical destination" 
-            className="w-full h-full object-cover"
+            className="hero-background"
             />
         </div>
 
