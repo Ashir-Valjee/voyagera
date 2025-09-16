@@ -11,6 +11,10 @@ class City(models.Model):
         unique=True,      # helps you map offer -> City quickly
         db_index=True,
     )
+    country_code = models.CharField(
+        max_length=2, blank=True, null=True, db_index=True
+    )
+    
     class Meta:
         db_table = "cities"
         unique_together = ("city","country")
