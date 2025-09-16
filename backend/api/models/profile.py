@@ -9,9 +9,8 @@ class Profile(models.Model):
         related_name="profile",
     )
 
-    profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, default="profile_pics/Portrait_Placeholder.png")
+    profile_pic = models.CharField(max_length=500, blank=True, null=True)
     
-
     home_city = models.ForeignKey( 
         City,
         null = True,

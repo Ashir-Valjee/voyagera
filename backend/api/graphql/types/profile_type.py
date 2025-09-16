@@ -2,10 +2,9 @@
 import graphene
 from graphene_django import DjangoObjectType
 from api.models import Profile
+from django.conf import settings
 
 class ProfileType(DjangoObjectType):
-    profilePicUrl = graphene.String()
-
     class Meta:
         model = Profile
         fields = (
@@ -20,8 +19,9 @@ class ProfileType(DjangoObjectType):
             "likes_film",
             "likes_family",
         )
-
-    def resolve_profilePicUrl(self, info):
+        
+    def resolve_profile_pic(self, info):
         if self.profile_pic:
-            return self.profile_pic.url
+            return f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{self.profile_pic}"
         return None
+

@@ -26,7 +26,7 @@ export const UpdateProfile = gql`
   mutation UpdateProfile(
     $firstName: String
     $lastName: String
-    $profilePic: Upload
+    $profilePic: String
     $homeCityId: ID
     $likesMusic: Boolean
     $likesSports: Boolean

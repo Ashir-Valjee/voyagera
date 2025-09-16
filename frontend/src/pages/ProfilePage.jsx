@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Profile from "../components/Profile";
-import { fetchUserProfile, updateUserProfile } from "../services/profile";
+import { fetchUserProfile, updateUserProfile, uploadProfilePicture } from "../services/profile";
 import { fetchFlightBookings } from "../services/flights";
 import { fetchCities } from "../services/city";
 
@@ -34,33 +34,28 @@ const ProfilePage = () => {
     }, []); 
 
     const handleUpdate = async (profileInfo) => {
+        const updatedData = { ...profile, ...profileInfo };
         
         try {
             const variables = {
-                firstName: profileInfo.firstName,
-                lastName: profileInfo.lastName,
-                homeCityId: profileInfo.homeCity?.id,
-                likesMusic: profileInfo.likesMusic,
-                likesSports: profileInfo.likesSports,
-                likesArts: profileInfo.likesArts,
-                likesFilm: profileInfo.likesFilm,
-                likesFamily: profileInfo.likesFamily,
+                firstName: updatedData.firstName,
+                lastName: updatedData.lastName,
+                homeCityId: updatedData.homeCity?.id,
+                likesMusic: updatedData.likesMusic,
+                likesSports: updatedData.likesSports,
+                likesArts: updatedData.likesArts,
+                likesFilm: updatedData.likesFilm,
+                likesFamily: updatedData.likesFamily,
             };
 
-            // Only include the profile picture if it's a new File object
-            if (profileInfo.profilePic instanceof File) {
-                variables.profilePic = profileInfo.profilePic;
-            }
+            if (profileInfo.profile_pic instanceof File) {
+            const uploadResult = await uploadProfilePicture(profileInfo.profile_pic);
+            variables.profilePic = uploadResult.fileUrl;
+        }
 
             const result = await updateUserProfile(variables);
 
-            console.log('Server response:', result);
-            console.log('Updated profile pic:', result?.updateProfile?.profile?.profilePic);
-
-
             if (result && result.success) {
-                console.log("Profile updated successfully!");
-                // Update local state with the newly saved profile from the server
                 setProfile(prevProfile => ({
                     ...prevProfile,
                     ...result.profile
