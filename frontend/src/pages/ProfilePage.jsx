@@ -3,6 +3,7 @@ import Profile from "../components/Profile";
 import { fetchUserProfile, updateUserProfile, uploadProfilePicture } from "../services/profile";
 import { fetchFlightBookings } from "../services/flights";
 import { fetchCities } from "../services/city";
+import { fetchActivityBookingsByUser } from '../services/activity_booking';
 
 const ProfilePage = () => {
     const [profile, setProfile] = useState(null);
@@ -15,12 +16,14 @@ const ProfilePage = () => {
     Promise.all([
         fetchUserProfile(),
         fetchFlightBookings(),
-        fetchCities()
+        fetchCities(),
+        fetchActivityBookingsByUser()
     ])
-    .then(([profileData, flightBookingsData, citiesData]) => {
+    .then(([profileData, flightBookingsData, citiesData, activityBookingsData]) => {
         setProfile({
             ...profileData,
-            flightBookings: flightBookingsData || [], 
+            flightBookings: flightBookingsData || [],
+            activityBookings: activityBookingsData || []
         });
         setCities(citiesData || []);
     })
@@ -68,7 +71,8 @@ const ProfilePage = () => {
                 setProfile(prevProfile => ({
                     ...prevProfile,
                     ...result.profile,
-                    flightBookings: prevProfile.flightBookings
+                    flightBookings: prevProfile.flightBookings,
+                    activityBookings: prevProfile.activityBookings
                 }));
                 return { success: true, profile: result.profile };
             } else {
