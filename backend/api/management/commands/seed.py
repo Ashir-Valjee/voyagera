@@ -235,6 +235,102 @@ CITY_DATA = [
     ("Christchurch", "New Zealand"),
 ]
 
+COUNTRY_NAME_TO_ISO2 = {
+    # Europe
+    "united kingdom": "GB",
+    "ireland": "IE",
+    "france": "FR",
+    "germany": "DE",
+    "netherlands": "NL",
+    "belgium": "BE",
+    "switzerland": "CH",
+    "austria": "AT",
+    "spain": "ES",
+    "portugal": "PT",
+    "italy": "IT",
+    "greece": "GR",
+    "turkey": "TR",
+    "romania": "RO",
+    "bulgaria": "BG",
+    "hungary": "HU",
+    "czechia": "CZ",
+    "poland": "PL",
+    "denmark": "DK",
+    "sweden": "SE",
+    "norway": "NO",
+    "finland": "FI",
+    "iceland": "IS",
+    "estonia": "EE",
+    "latvia": "LV",
+    "lithuania": "LT",
+    "croatia": "HR",
+    "slovenia": "SI",
+    "slovakia": "SK",
+    "bosnia and herzegovina": "BA",
+    "serbia": "RS",
+    "north macedonia": "MK",
+    "albania": "AL",
+    "montenegro": "ME",
+    "kosovo": "XK",      # widely used, not official ISO but commonly accepted
+    "moldova": "MD",
+    "ukraine": "UA",
+    "belarus": "BY",
+    "russia": "RU",
+
+    # Middle East / North Africa
+    "qatar": "QA",
+    "united arab emirates": "AE",
+    "saudi arabia": "SA",
+    "oman": "OM",
+    "kuwait": "KW",
+    "bahrain": "BH",
+    "israel": "IL",
+    "jordan": "JO",
+    "lebanon": "LB",
+    "egypt": "EG",
+    "morocco": "MA",
+    "tunisia": "TN",
+    "algeria": "DZ",
+
+    # Sub-Saharan Africa
+    "kenya": "KE",
+    "ethiopia": "ET",
+    "ghana": "GH",
+    "nigeria": "NG",
+    "senegal": "SN",
+    "south africa": "ZA",
+    "zimbabwe": "ZW",
+    "mozambique": "MZ",
+    "angola": "AO",
+    "botswana": "BW",
+    "namibia": "NA",
+    "madagascar": "MG",
+
+    # Americas
+    "united states": "US",
+    "canada": "CA",
+    "mexico": "MX",
+
+    # South/West/Central Asia + SEA + Oceania
+    "india": "IN",
+    "pakistan": "PK",
+    "bangladesh": "BD",
+    "sri lanka": "LK",
+    "nepal": "NP",
+    "thailand": "TH",
+    "vietnam": "VN",
+    "malaysia": "MY",
+    "singapore": "SG",
+    "indonesia": "ID",
+    "philippines": "PH",
+    "japan": "JP",
+    "south korea": "KR",
+    "hong kong": "HK",
+    "taiwan": "TW",
+    "australia": "AU",
+    "new zealand": "NZ",
+}
+
 CATEGORIES = ["MUSEUM", "FOOD", "SPORT", "FAMILY", "ARTS", "FILM"]
 
 
@@ -316,8 +412,27 @@ class Command(BaseCommand):
         self.stdout.write("Creating cities...")
         cities = []
         for city, country in CITY_DATA:
-            obj, _ = City.objects.get_or_create(city=city, country=country)
+            # look up ISO2 code from country name
+            cc = COUNTRY_NAME_TO_ISO2.get((country or "").strip().lower())
+
+            obj, created = City.objects.get_or_create(
+                city=city,
+                country=country,
+                defaults={"country_code": cc},
+            )
+
+            # if city existed, backfill/repair country_code
+            if cc and obj.country_code != cc:
+                obj.country_code = cc
+                obj.save(update_fields=["country_code"])
+
+            # (optional) if you also want to auto-fill iata_code when empty:
+            # if not obj.iata_code:
+            #     obj.iata_code = (city[:3] or "XXX").upper()  # or a real mapping
+            #     obj.save(update_fields=["iata_code"])
+
             cities.append(obj)
+
         if not cities:
             self.stdout.write(self.style.WARNING("No cities created; check CITY_DATA."))
             return
