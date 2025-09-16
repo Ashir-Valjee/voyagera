@@ -1,7 +1,29 @@
-import { prettyWhen } from "../utils/helpers";
-
 export default function ActivityCard({ ev, onBook, busy = false }) {
-  // ev: { id, name, city, classificationName, startDateTime, imageUrl, eventUrl }
+  const label = ev.uiCategory || "Family";
+
+  function prettyWhen(s) {
+    if (!s) return "";
+    const d = new Date(s);
+    if (!isNaN(d)) {
+      return d.toLocaleString(undefined, {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    }
+    try {
+      const [y, m, dd] = s.split("-");
+      return new Date(Number(y), Number(m) - 1, Number(dd)).toLocaleDateString(
+        undefined,
+        { weekday: "short", year: "numeric", month: "short", day: "numeric" }
+      );
+    } catch {
+      return s;
+    }
+  }
 
   return (
     <li className="card bg-base-100 shadow-md overflow-hidden">
@@ -17,11 +39,7 @@ export default function ActivityCard({ ev, onBook, busy = false }) {
       <div className="card-body">
         <div className="flex items-start justify-between gap-2">
           <h3 className="card-title text-base leading-tight">{ev.name}</h3>
-          {ev.classificationName && (
-            <span className="badge badge-outline shrink-0">
-              {ev.classificationName}
-            </span>
-          )}
+          <span className="badge badge-outline shrink-0">{label}</span>
         </div>
 
         <p className="text-sm opacity-80">{ev.city}</p>
@@ -36,7 +54,6 @@ export default function ActivityCard({ ev, onBook, busy = false }) {
           >
             Details
           </a>
-
           <button
             className={`btn btn-sm btn-primary ${busy ? "btn-disabled" : ""}`}
             onClick={() => onBook?.(ev)}

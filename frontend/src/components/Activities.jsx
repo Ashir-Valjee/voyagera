@@ -1,28 +1,21 @@
-// src/components/Activities.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { fetchCities } from "../services/cities";
 import {
   fetchTicketmasterEvents,
-  createActivityBooking, // NEW
+  createActivityBooking,
 } from "../services/activity_booking";
-import { fetchFlightBookings } from "../services/flights"; // NEW
+import { fetchFlightBookings } from "../services/flights";
 import ActivityCard from "./ActivityCard";
 import {
   dayStartZ,
   dayEndZ,
   addDaysYMD,
   resolveCityName,
+  normalizeCategory,
+  toTicketmasterFilter,
+  ensureDateTimeZ,
 } from "../utils/helpers";
-
-// local tiny helper: ensure a DateTime string for our mutation
-function ensureDateTimeZ(s) {
-  if (!s) return null;
-  // if it's only a date like "2025-09-17", set noon UTC
-  if (!s.includes("T")) return `${s}T12:00:00Z`;
-  // if it has time but no Z, assume UTC and add Z
-  return s.endsWith("Z") ? s : `${s}Z`;
-}
 
 export default function Activities() {
   const [params] = useSearchParams();
@@ -31,7 +24,6 @@ export default function Activities() {
   const [events, setEvents] = useState([]);
   const [classification, setClassification] = useState("");
 
-  // NEW: keep cities + user flight bookings + which card is busy
   const [cities, setCities] = useState([]);
   const [bookings, setBookings] = useState([]);
   const [busyId, setBusyId] = useState(null);
@@ -68,7 +60,6 @@ export default function Activities() {
           return;
         }
 
-        // Load Cities + user's flight bookings (best effort if not logged in)
         const [citiesList, userBookings] = await Promise.all([
           fetchCities(),
           fetchFlightBookings().catch(() => []),
@@ -77,7 +68,6 @@ export default function Activities() {
         setCities(citiesList);
         setBookings(Array.isArray(userBookings) ? userBookings : []);
 
-        // Resolve full city name and fetch events
         const cityName = resolveCityName(destinationParam, citiesList);
         if (!cityName) {
           throw new Error(
@@ -85,15 +75,22 @@ export default function Activities() {
           );
         }
 
+        const tmFilter = toTicketmasterFilter(classification);
         const results = await fetchTicketmasterEvents({
           city: cityName,
           startDateTime: startIso,
           endDateTime: endIso,
-          classificationName: classification || undefined,
+          classificationName: tmFilter, // "Arts & Theatre" for Arts, etc.
           size: 24,
         });
 
-        if (!cancelled) setEvents(results);
+        // Add our normalized category to each event for UI + booking
+        const normalized = (results || []).map((ev) => ({
+          ...ev,
+          uiCategory: normalizeCategory(ev?.classificationName),
+        }));
+
+        if (!cancelled) setEvents(normalized);
       } catch (e) {
         if (!cancelled) {
           console.error(e);
@@ -109,17 +106,14 @@ export default function Activities() {
     };
   }, [destinationParam, startIso, endIso, classification]);
 
-  // NEW: minimal booking handler
   async function handleBook(ev) {
     try {
       setBusyId(ev.id);
 
-      // 1) map event city -> City record
       const cityRec =
         cities.find(
           (c) => (c.city || "").toLowerCase() === (ev.city || "").toLowerCase()
         ) ||
-        // fallback to the resolved destination if TM city name differs
         cities.find(
           (c) =>
             (c.city || "").toLowerCase() ===
@@ -128,7 +122,7 @@ export default function Activities() {
       if (!cityRec)
         throw new Error("Couldn't map event city to a City record.");
 
-      // 2) pick a flight booking to associate (most recent)
+      //  pick a flight booking to associate (most recent)
       if (!bookings?.length) {
         throw new Error("No flight booking found. Please book a flight first.");
       }
@@ -137,24 +131,26 @@ export default function Activities() {
           new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime()
       )[0];
 
-      // 3) create the activity booking (basic defaults)
+      // 3) create the activity booking with UPPERCASE category
+      const categoryUpper = (ev.uiCategory || "Family").toUpperCase();
+
       const res = await createActivityBooking(
-        ensureDateTimeZ(ev.startDateTime), // activityDateTime
-        cityRec.id, // locationCityId
-        1, // numberOfPeople
-        ev.classificationName || "General", // category
-        ev.name, // activityName
-        ev.eventUrl, // activityUrl
-        "0.00", // totalPrice (string for Decimal)
-        chosen.id, // flightBookingId
-        ev.imageUrl || "" // imageUrl
+        ensureDateTimeZ(ev.startDateTime),
+        cityRec.id,
+        1,
+        categoryUpper,
+        ev.name,
+        ev.eventUrl,
+        "0.00",
+        chosen.id,
+        ev.imageUrl || ""
       );
 
       if (!res?.success) {
         throw new Error(res?.errors?.join(", ") || "Booking failed");
       }
 
-      alert("Activity saved to your trip!");
+      alert("Activity booked to your trip!");
     } catch (e) {
       console.error(e);
       alert(e.message || "Failed to book activity");
@@ -178,7 +174,7 @@ export default function Activities() {
             <option value="">All</option>
             <option value="Music">Music</option>
             <option value="Sports">Sports</option>
-            <option value="Arts & Theatre">Arts & Theatre</option>
+            <option value="Arts">Arts</option>
             <option value="Film">Film</option>
             <option value="Family">Family</option>
           </select>
@@ -213,8 +209,8 @@ export default function Activities() {
             <ActivityCard
               key={ev.id}
               ev={ev}
-              onBook={handleBook} // NEW
-              busy={busyId === ev.id} // NEW
+              onBook={handleBook}
+              busy={busyId === ev.id}
             />
           ))}
         </ul>
