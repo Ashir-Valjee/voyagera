@@ -17,7 +17,7 @@ const ProfilePage = () => {
         fetchUserProfile(),
         fetchFlightBookings(),
         fetchCities(),
-        fetchActivityBookingsByUser()
+        fetchActivityBookingsByUser(),
     ])
     .then(([profileData, flightBookingsData, citiesData, activityBookingsData]) => {
         setProfile({
