@@ -7,15 +7,12 @@ export default function ResultsPage() {
   const [tab, setTab] = useState("flights");
   const [params] = useSearchParams();
 
-  // lifted state
   const [offers, setOffers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
 
-  // track the last params key for which we fetched
   const [lastKey, setLastKey] = useState(null);
 
-  // stable key that changes only when URL query changes
   const paramsKey = params.toString();
 
   return (
@@ -41,14 +38,12 @@ export default function ResultsPage() {
 
       {tab === "flights" ? (
         <FlightResults
-          // lifted state
           offers={offers}
           setOffers={setOffers}
           loading={loading}
           setLoading={setLoading}
           err={err}
           setErr={setErr}
-          // keys to control refetching
           paramsKey={paramsKey}
           lastKey={lastKey}
           setLastKey={setLastKey}

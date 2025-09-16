@@ -50,10 +50,10 @@ export async function createFlightBooking(
   departureDateTime,
   destinationAirport,
   destinationCityId,
-  flightDuration,
+  flightDuration, // number or string
   numberOfPassengers,
   numberOfStops,
-  totalPrice
+  totalPrice // number or string
 ) {
   const { data } = await apollo.mutate({
     mutation: CreateFlightBooking,
@@ -64,10 +64,10 @@ export async function createFlightBooking(
       departureDateTime,
       destinationAirport,
       destinationCityId,
-      flightDuration,
+      flightDuration: String(flightDuration), // <-- ensure Decimal string
       numberOfPassengers,
       numberOfStops,
-      totalPrice,
+      totalPrice: String(totalPrice), // <-- ensure Decimal string
     },
   });
   return data?.createFlightBooking ?? null;

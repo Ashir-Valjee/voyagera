@@ -92,7 +92,7 @@ export const CreateFlightBooking = gql`
     $departureDateTime: DateTime!
     $destinationAirport: String!
     $destinationCityId: ID!
-    $flightDuration: Float!
+    $flightDuration: Decimal!
     $numberOfPassengers: Int!
     $numberOfStops: Int!
     $totalPrice: Decimal!

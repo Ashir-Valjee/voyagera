@@ -1,8 +1,8 @@
-// src/components/FlightResults.jsx
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { fetchCities } from "../services/cities";
-import { searchFlights } from "../services/flights";
+
+import { searchFlights, createFlightBooking } from "../services/flights";
 import FlightCard from "./FlightCard";
 
 export default function FlightResults({
@@ -17,9 +17,9 @@ export default function FlightResults({
   setLastKey,
 }) {
   const [params] = useSearchParams();
+  const [bookingBusy, setBookingBusy] = useState(false);
 
   useEffect(() => {
-    // if we already fetched for this query string, don't fetch again
     if (lastKey === paramsKey && offers.length > 0) return;
 
     let cancelled = false;
@@ -28,14 +28,13 @@ export default function FlightResults({
       setLoading(true);
       setErr(null);
       try {
-        const origin = params.get("origin") || "";
-        const destination = params.get("destination") || "";
+        const origin = (params.get("origin") || "").toUpperCase();
+        const destination = (params.get("destination") || "").toUpperCase();
         const departureDate = params.get("departureDate") || "";
         const returnDate = params.get("returnDate") || undefined;
         const adults = Number(params.get("adults") || 1);
         const nonStop = params.get("nonStop") === "true";
 
-        // (optional) skip if required fields missing
         if (!origin || !destination || !departureDate) {
           if (!cancelled) {
             setOffers([]);
@@ -70,15 +69,73 @@ export default function FlightResults({
     return () => {
       cancelled = true;
     };
-  }, [paramsKey]); // only re-run when the URL query actually changes
+  }, [paramsKey]);
 
-  const handleSelect = (offer) => {
-    // TODO: call your createFlightBooking mutation
-    console.log("Selected:", offer);
+  const handleSelect = async (offer) => {
+    try {
+      setBookingBusy(true);
+
+      const originCityCode = (params.get("origin") || "").toUpperCase();
+      const destinationCityCode = (
+        params.get("destination") || ""
+      ).toUpperCase();
+      const passengers = Number(params.get("adults") || 1);
+
+      if (!originCityCode || !destinationCityCode) {
+        throw new Error(
+          "Missing origin/destination in the URL. Please start a new search."
+        );
+      }
+
+      const cities = await fetchCities();
+      const depCity = cities.find(
+        (c) => (c.iataCode || "").toUpperCase() === originCityCode
+      );
+      const destCity = cities.find(
+        (c) => (c.iataCode || "").toUpperCase() === destinationCityCode
+      );
+
+      if (!depCity || !destCity) {
+        throw new Error(
+          "Could not match your city codes to City records. " +
+            "Use city IATA codes (e.g., LON not LHR; PAR not CDG) and backfill City.iataCode."
+        );
+      }
+
+      const durationHours =
+        offer.outDurationHours ??
+        (offer.outDurationMinutes
+          ? Math.round((offer.outDurationMinutes / 60) * 100) / 100
+          : 0);
+
+      const result = await createFlightBooking(
+        offer.outArrivalAt,
+        offer.outDepartureIata,
+        depCity.id,
+        offer.outDepartureAt,
+        offer.outArrivalIata,
+        destCity.id,
+        String(durationHours),
+        passengers,
+        offer.outStops ?? 0,
+        String(offer.priceTotal)
+      );
+
+      if (!result?.success) {
+        throw new Error(result?.errors?.join(", ") || "Create booking failed");
+      }
+
+      alert("Flight booked!");
+    } catch (e) {
+      console.error("Booking error:", e);
+      console.error("Network error body:", e?.networkError?.result);
+      alert(e.message || "Failed to book flight");
+    } finally {
+      setBookingBusy(false);
+    }
   };
 
   const handleRetry = () => {
-    // force a refetch by clearing lastKey so the effect runs again
     setLastKey(null);
   };
 
@@ -123,6 +180,14 @@ export default function FlightResults({
             <FlightCard key={o.id} offer={o} onSelect={handleSelect} />
           ))}
         </ul>
+      )}
+
+      {bookingBusy && (
+        <div className="toast toast-end">
+          <div className="alert alert-info">
+            <span>Processing your booking…</span>
+          </div>
+        </div>
       )}
     </section>
   );
