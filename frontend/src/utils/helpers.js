@@ -211,3 +211,18 @@ export function estimatePriceForEvent(uiCategory, countryCode, seedKey) {
   const amt = Math.round((lo + t * (hi - lo)) * 100) / 100; // 2dp
   return { amount: amt, currency: guessCurrencyByCountryCode(countryCode) };
 }
+
+export function toEpochMillis(s) {
+  if (!s) return Number.POSITIVE_INFINITY;
+  if (s.includes("T")) {
+    const d = new Date(s);
+    return isNaN(d) ? Number.POSITIVE_INFINITY : d.getTime();
+  }
+  // handle YYYY-MM-DD (treat as start of day UTC)
+  try {
+    const [y, m, d] = s.split("-").map(Number);
+    return Date.UTC(y, (m || 1) - 1, d || 1, 0, 0, 0, 0);
+  } catch {
+    return Number.POSITIVE_INFINITY;
+  }
+}

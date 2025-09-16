@@ -16,6 +16,7 @@ import {
   toTicketmasterFilter,
   ensureDateTimeZ,
   estimatePriceForEvent,
+  toEpochMillis,
 } from "../utils/helpers";
 
 export default function Activities() {
@@ -123,7 +124,13 @@ export default function Activities() {
           };
         });
 
-        if (!cancelled) setEvents(withPrices);
+        const sorted = withPrices
+          .slice()
+          .sort(
+            (a, b) =>
+              toEpochMillis(a.startDateTime) - toEpochMillis(b.startDateTime)
+          );
+        if (!cancelled) setEvents(sorted);
       } catch (e) {
         if (!cancelled) {
           console.error(e);
