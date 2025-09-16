@@ -1,5 +1,31 @@
 import { Pencil, Trash2} from 'lucide-react'
-const FlightBookings = ({ bookings }) => {
+import { useState } from "react";
+import { deleteFlightBooking } from "../services/flights";
+
+
+const FlightBookings = ({ bookings, onDelete }) => {
+    const [selectedBooking, setSelectedBooking] = useState(null);
+    const [loading, setLoading] = useState(false);
+
+    const handleDelete = async () => {
+        if (!selectedBooking) return;
+
+        try {
+        setLoading(true);
+        await deleteFlightBooking(selectedBooking.id);
+
+        // update parent state
+        if (onDelete) {
+            onDelete(selectedBooking.id);
+        }
+        } catch (err) {
+        console.error("Failed to delete booking:", err);
+        } finally {
+        setLoading(false);
+        setSelectedBooking(null); // close modal
+        }
+    };
+    
     if (!bookings || bookings.length === 0) {
         return <p className="text-center text-base-content/60">No flights booked yet.</p>;
     }
@@ -38,16 +64,49 @@ const FlightBookings = ({ bookings }) => {
                             <button className="btn btn-primary btn-sm"> 
                                 <Pencil className='w-4 h-4' />
                             </button>
-                            <button className="btn btn-outline btn-sm ml-2">
-                                <Trash2 className='w-4 h-4'/>
-                            </button>
-                            <button className="btn btn-outline btn-sm ml-2">
-                                View Activities
-                            </button>
-                        </div>
-                    </div>
-                ))}
+                            <button
+                className="btn btn-soft btn-error btn-sm ml-2"
+                onClick={() => setSelectedBooking(booking)}
+                >
+                    <Trash2 className="w-4 h-4" />
+                </button>
+                <button className="btn btn-outline btn-sm ml-2">
+                    View Activities
+                </button>
+                </div>
             </div>
+            ))}
+        </div>
+
+        {/* Confirmation Modal */}
+        {selectedBooking && (
+            <div className="modal modal-open">
+            <div className="modal-box">
+                <h3 className="font-bold text-lg text-error">Confirm Delete</h3>
+                <p className="py-4">
+                Are you sure you want to delete this booking from{" "}
+                <strong>{selectedBooking.departureCity?.city}</strong> to{" "}
+                <strong>{selectedBooking.destinationCity?.city}</strong>?
+                </p>
+                <div className="modal-action">
+                <button
+                    className={`btn btn-soft btn-error ${loading ? "loading" : ""}`}
+                    onClick={handleDelete}
+                    disabled={loading}
+                >
+                    {loading ? "Deleting..." : "Yes, Delete"}
+                </button>
+                <button
+                    className="btn btn-soft"
+                    onClick={() => setSelectedBooking(null)}
+                    disabled={loading}
+                >
+                    Cancel
+                </button>
+                </div>
+            </div>
+            </div>
+        )}
         </div>
     );
 };

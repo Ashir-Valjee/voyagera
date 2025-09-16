@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import PlaceholderImage from "../assets/Portrait_Placeholder.png"
 import FlightBookings from './FlightBookingProfile'
-import { FlightBooking } from '../services/gql/flights';
 import ActivityBookings from './ActivityProfile';
 
-const Profile = ({ initialProfile, cities = [], onUpdate }) => {
+const Profile = ({ initialProfile, cities = [], onUpdate, onDeleteFlight}) => {
     const [profile, setProfile] = useState(initialProfile || {
         id: null,
         firstName: '',
@@ -179,7 +178,8 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
 
             <div className="mt-6">
             {activeTab === "flights" && (
-                <FlightBookings bookings={initialProfile?.flightBookings} />
+                <FlightBookings bookings={initialProfile?.flightBookings}
+                onDelete={onDeleteFlight} />
             )}
             {activeTab === "activities" && (
                 <>
