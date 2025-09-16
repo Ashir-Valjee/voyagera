@@ -1,6 +1,7 @@
 // src/components/FlightResults.jsx
 import { useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
+import { fetchCities } from "../services/cities";
 import { searchFlights } from "../services/flights";
 import FlightCard from "./FlightCard";
 
