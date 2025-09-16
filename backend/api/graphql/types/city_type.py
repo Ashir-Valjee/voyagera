@@ -7,5 +7,6 @@ class CityType(DjangoObjectType):
         fields = (
             "id",
             "city",
-            "country"
+            "country",
+            "iata_code",
         )
