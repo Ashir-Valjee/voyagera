@@ -76,15 +76,26 @@ export default function Activities() {
         }
 
         const tmFilter = toTicketmasterFilter(classification);
+        const destCity =
+          citiesList.find(
+            (c) => (c.city || "").toLowerCase() === cityName.toLowerCase()
+          ) ||
+          citiesList.find(
+            (c) =>
+              (c.iataCode || "").toUpperCase() ===
+              destinationParam.toUpperCase()
+          );
+        const countryCode = destCity?.countryCode || undefined;
+
         const results = await fetchTicketmasterEvents({
           city: cityName,
+          countryCode: countryCode,
           startDateTime: startIso,
           endDateTime: endIso,
           classificationName: tmFilter, // "Arts & Theatre" for Arts, etc.
           size: 24,
         });
 
-        // Add our normalized category to each event for UI + booking
         const normalized = (results || []).map((ev) => ({
           ...ev,
           uiCategory: normalizeCategory(ev?.classificationName),

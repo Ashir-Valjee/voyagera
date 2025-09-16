@@ -129,6 +129,7 @@ export const UpdateActivityBooking = gql`
 export const TICKETMASTER_EVENTS = gql`
   query TicketmasterEvents(
     $city: String
+    $countryCode: String
     $startDateTime: String
     $endDateTime: String
     $classificationName: String
@@ -136,6 +137,7 @@ export const TICKETMASTER_EVENTS = gql`
   ) {
     ticketmasterEvents(
       city: $city
+      countryCode: $countryCode
       startDateTime: $startDateTime
       endDateTime: $endDateTime
       classificationName: $classificationName

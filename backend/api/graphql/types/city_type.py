@@ -9,4 +9,5 @@ class CityType(DjangoObjectType):
             "city",
             "country",
             "iata_code",
+            "country_code",
         )

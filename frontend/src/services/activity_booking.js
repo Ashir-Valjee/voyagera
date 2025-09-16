@@ -81,6 +81,7 @@ export async function deleteActivityBooking(id) {
 
 export async function fetchTicketmasterEvents({
   city,
+  countryCode,
   startDateTime,
   endDateTime,
   classificationName,
@@ -90,6 +91,7 @@ export async function fetchTicketmasterEvents({
     query: TICKETMASTER_EVENTS,
     variables: {
       city,
+      countryCode,
       startDateTime,
       endDateTime,
       classificationName: classificationName || undefined,

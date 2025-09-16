@@ -7,6 +7,7 @@ export const CITIES = gql`
       country
       city
       iataCode
+      countryCode
     }
   }
 `;
