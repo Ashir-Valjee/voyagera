@@ -38,6 +38,14 @@ export const AMADEUS_FLIGHT_OFFERS = gql`
       retCarrierCode
       retFlightNumber
       retStops
+      outDurationIso
+      outDurationMinutes
+      outDurationHours
+      retDurationIso
+      retDurationMinutes
+      retDurationHours
+      totalDurationMinutes
+      totalDurationHours
     }
   }
 `;
@@ -104,7 +112,7 @@ export const CreateFlightBooking = gql`
     $departureDateTime: DateTime!
     $destinationAirport: String!
     $destinationCityId: ID!
-    $flightDuration: Float!
+    $flightDuration: Decimal!
     $numberOfPassengers: Int!
     $numberOfStops: Int!
     $totalPrice: Decimal!

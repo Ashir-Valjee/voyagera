@@ -1,4 +1,9 @@
 import { toYMD, formatIsoToYMDHM } from "../utils/dates";
+import {
+  computeMinutesBetween,
+  formatMinutes,
+  stopLabel,
+} from "../utils/helpers";
 
 export default function FlightCard({ offer, onSelect }) {
   const hasReturn = Boolean(offer.retDepartureIata);
@@ -6,10 +11,23 @@ export default function FlightCard({ offer, onSelect }) {
   const outDate = toYMD(offer.outDepartureAt);
   const retDate = hasReturn ? toYMD(offer.retDepartureAt) : null;
 
+  const outMins =
+    offer.outDurationMinutes ??
+    computeMinutesBetween(offer.outDepartureAt, offer.outArrivalAt);
+
+  const retMins = hasReturn
+    ? offer.retDurationMinutes ??
+      computeMinutesBetween(offer.retDepartureAt, offer.retArrivalAt)
+    : 0;
+
+  const totalMins =
+    offer.totalDurationMinutes ??
+    (outMins || 0) + (hasReturn ? retMins || 0 : 0);
+
   return (
     <li className="list-row">
       <div>
-        <img className="size-10 rounded-box" src="plane-logo.jpg" />
+        <img className="size-10 rounded-box" src="plane-logo.jpg" alt="" />
       </div>
 
       <div className="min-w-0">
@@ -20,6 +38,14 @@ export default function FlightCard({ offer, onSelect }) {
           <span className="badge badge-neutral shrink-0">
             {offer.priceCurrency} {offer.priceTotal}
           </span>
+          {!!totalMins && (
+            <span
+              className="badge badge-outline shrink-0"
+              title="Total duration"
+            >
+              {formatMinutes(totalMins)}
+            </span>
+          )}
         </div>
 
         <div className="text-xs uppercase font-semibold opacity-60">
@@ -30,6 +56,7 @@ export default function FlightCard({ offer, onSelect }) {
         <div className="text-xs opacity-70 mt-1">
           Outbound: {formatIsoToYMDHM(offer.outDepartureAt)} →{" "}
           {formatIsoToYMDHM(offer.outArrivalAt)}
+          {outMins ? <> · {formatMinutes(outMins)}</> : null}
           {offer.outCarrierCode && (
             <>
               {" "}
@@ -38,7 +65,7 @@ export default function FlightCard({ offer, onSelect }) {
             </>
           )}
           {offer.outStops !== null && offer.outStops !== undefined && (
-            <> · {offer.outStops} stop</>
+            <> · {stopLabel(offer.outStops)}</>
           )}
         </div>
 
@@ -46,6 +73,7 @@ export default function FlightCard({ offer, onSelect }) {
           <div className="text-xs opacity-70">
             Return: {formatIsoToYMDHM(offer.retDepartureAt)} →{" "}
             {formatIsoToYMDHM(offer.retArrivalAt)}
+            {retMins ? <> · {formatMinutes(retMins)}</> : null}
             {offer.retCarrierCode && (
               <>
                 {" "}
@@ -54,14 +82,14 @@ export default function FlightCard({ offer, onSelect }) {
               </>
             )}
             {offer.retStops !== null && offer.retStops !== undefined && (
-              <> · {offer.retStops} stop</>
+              <> · {stopLabel(offer.retStops)}</>
             )}
           </div>
         )}
       </div>
 
       <button
-        className="btn  btn-primary"
+        className="btn btn-primary"
         title="Select"
         onClick={() => onSelect?.(offer)}
       >

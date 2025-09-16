@@ -1,31 +1,38 @@
 import { apollo } from "../lib/apollo";
-import { SingleActivityBooking, ActivityBookingsByFlight, CreateActivityBooking, DeleteActivityBooking, UpdateActivityBooking, ActivityBookingsByUser } from "./gql/activity_booking";
-
+import {
+  SingleActivityBooking,
+  ActivityBookingsByFlight,
+  CreateActivityBooking,
+  DeleteActivityBooking,
+  UpdateActivityBooking,
+  TICKETMASTER_EVENTS,
+  ActivityBookingsByUser,
+} from "./gql/activity_booking";
 
 export async function fetchSingleActivityBooking(id) {
-    const { data } = await apollo.query({
-        query: SingleActivityBooking,
-        variables: {id},
-        fetchPolicy: "network-only",
-    }); 
-    return data?.singleActivityBooking ?? null;
+  const { data } = await apollo.query({
+    query: SingleActivityBooking,
+    variables: { id },
+    fetchPolicy: "network-only",
+  });
+  return data?.singleActivityBooking ?? null;
 }
 
 export async function fetchActivityBookingByFlight(flightBookingId) {
-    const { data } = await apollo.query({
-        query: ActivityBookingsByFlight,
-        variables: {flightBookingId},
-        fetchPolicy: "network-only",
-    });
-    return data?.activityBookingsByFlightId ?? null;
+  const { data } = await apollo.query({
+    query: ActivityBookingsByFlight,
+    variables: { flightBookingId },
+    fetchPolicy: "network-only",
+  });
+  return data?.activityBookingsByFlightId ?? null;
 }
 
-export async function fetchActivityBookingsByUser(){
+export async function fetchActivityBookingsByUser() {
   const { data } = await apollo.query({
-        query: ActivityBookingsByUser,
-        fetchPolicy: "network-only",
-    });
-    return data?.activityBookingsByUser ?? null;
+    query: ActivityBookingsByUser,
+    fetchPolicy: "network-only",
+  });
+  return data?.activityBookingsByUser ?? null;
 }
 
 export async function createActivityBooking(
@@ -68,4 +75,25 @@ export async function deleteActivityBooking(id) {
     variables: { id },
   });
   return data?.deleteActivityBooking ?? null;
+}
+
+export async function fetchTicketmasterEvents({
+  city,
+  startDateTime,
+  endDateTime,
+  classificationName,
+  size = 24,
+}) {
+  const { data } = await apollo.query({
+    query: TICKETMASTER_EVENTS,
+    variables: {
+      city,
+      startDateTime,
+      endDateTime,
+      classificationName: classificationName || undefined,
+      size,
+    },
+    fetchPolicy: "no-cache",
+  });
+  return data?.ticketmasterEvents ?? [];
 }
