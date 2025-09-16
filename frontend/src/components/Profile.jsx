@@ -24,7 +24,7 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file) {
-            const updatedProfile = { ...profile, profilePice: file };
+            const updatedProfile = { ...profile, profilePic: file };
         setProfile(updatedProfile);
         handleAutoSave('profilePic', file);
         }
@@ -77,12 +77,9 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
                         <div className="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
                             <img
                                 src={
-                                    // 1. If it's a File, create a temporary preview URL
                                     profile.profilePic instanceof File
                                         ? URL.createObjectURL(profile.profilePic)
-                                        // 2. If not a file, check if profile.profilePic is a non-empty string
                                         : profile.profilePic 
-                                            // 3. If yes, use it. If no (it's null/empty), use the placeholder.
                                             ? profile.profilePic 
                                             : PlaceholderImage
                                 }

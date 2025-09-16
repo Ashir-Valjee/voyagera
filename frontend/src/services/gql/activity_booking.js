@@ -11,6 +11,7 @@ export const SingleActivityBooking = gql`
       activityName
       activityUrl
       totalPrice
+      imageUrl
     }
   }
 `;
@@ -26,6 +27,7 @@ export const ActivityBookingsByFlight = gql`
       activityName
       activityUrl
       totalPrice
+      imageUrl
     }
   }
 `;
@@ -40,6 +42,7 @@ export const ActivityBookingsByUser = gql`
       activityName
       activityUrl
       totalPrice
+      imageUrl
       flightBooking {
         id
         destinationCity {
@@ -62,6 +65,7 @@ export const CreateActivityBooking = gql`
     $activityUrl: String!
     $totalPrice: Decimal!
     $flightBookingId: ID!
+    $imageUrl: String!
   ) {
     createActivityBooking(
       activityDateTime: $activityDateTime
@@ -72,6 +76,7 @@ export const CreateActivityBooking = gql`
       activityUrl: $activityUrl
       totalPrice: $totalPrice
       flightBookingId: $flightBookingId
+      imageUrl: $imageUrl
     ) {
       activityBooking {
         id
@@ -82,6 +87,7 @@ export const CreateActivityBooking = gql`
         activityName
         totalPrice
         activityUrl
+        imageUrl
       }
       success
       errors

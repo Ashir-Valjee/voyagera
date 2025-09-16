@@ -15,8 +15,9 @@ class FileUploadView(View):
         if not file_obj:
             return JsonResponse({'error': 'No file provided.'}, status=400)
 
-        # Use the default storage (S3) to save the file
-        file_name = default_storage.save(file_obj.name, file_obj)
+        file_path = f"profile_pics/{file_obj.name}"
+        # Save to file path
+        file_name = default_storage.save(file_path, file_obj)
         file_url = default_storage.url(file_name)
 
         return JsonResponse({'fileUrl': file_url})

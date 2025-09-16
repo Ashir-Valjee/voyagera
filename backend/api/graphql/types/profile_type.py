@@ -19,9 +19,3 @@ class ProfileType(DjangoObjectType):
             "likes_film",
             "likes_family",
         )
-        
-    def resolve_profile_pic(self, info):
-        if self.profile_pic:
-            return f"https://{settings.AWS_S3_CUSTOM_DOMAIN}/{self.profile_pic}"
-        return None
-

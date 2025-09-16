@@ -88,6 +88,7 @@ describe("Activity Service Functions", () => {
           activityUrl: "http://example.com",
           totalPrice: 50,
           flightBookingId: 1,
+          imageUrl: "http://example.com"
         };
 
         apollo.mutate.mockResolvedValue({
@@ -102,7 +103,8 @@ describe("Activity Service Functions", () => {
           "Lunch",
           "http://example.com",
           50,
-          1
+          1,
+          "http://example.com"
         );
 
         expect(result).toEqual(newActivity);
