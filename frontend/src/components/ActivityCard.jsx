@@ -1,4 +1,9 @@
-export default function ActivityCard({ ev, onBook, busy = false }) {
+export default function ActivityCard({
+  ev,
+  onBook,
+  busy = false,
+  peopleCount = 1,
+}) {
   const label = ev.uiCategory || "Family";
 
   function prettyWhen(s) {
@@ -14,15 +19,38 @@ export default function ActivityCard({ ev, onBook, busy = false }) {
         minute: "2-digit",
       });
     }
-    try {
-      const [y, m, dd] = s.split("-");
-      return new Date(Number(y), Number(m) - 1, Number(dd)).toLocaleDateString(
-        undefined,
-        { weekday: "short", year: "numeric", month: "short", day: "numeric" }
-      );
-    } catch {
-      return s;
+    return s;
+  }
+
+  function fmt(n) {
+    if (n == null) return "";
+    const num = Number(n);
+    if (!isFinite(num)) return String(n);
+    const isInt = Math.abs(num - Math.round(num)) < 1e-9;
+    return num.toLocaleString(undefined, {
+      minimumFractionDigits: isInt ? 0 : 2,
+      maximumFractionDigits: 2,
+    });
+  }
+
+  // Price badge (group price = unit * peopleCount)
+  const ccy = ev.priceCurrency || "";
+  const unitMin = ev.priceMin;
+  const unitMax = ev.priceMax;
+
+  const groupMin = unitMin != null ? unitMin * peopleCount : null;
+  const groupMax = unitMax != null ? unitMax * peopleCount : null;
+
+  let priceText = "Price TBA";
+  if (groupMin != null || groupMax != null) {
+    if (groupMin != null && groupMax != null && groupMin !== groupMax) {
+      priceText = `${ccy ? `${ccy} ` : ""}${fmt(groupMin)}–${fmt(groupMax)}`;
+    } else {
+      const one = groupMin ?? groupMax;
+      priceText = `${ccy ? `${ccy} ` : ""}${fmt(one)}`;
     }
+  } else if (ccy) {
+    priceText = `${ccy} TBA`;
   }
 
   return (
@@ -33,17 +61,22 @@ export default function ActivityCard({ ev, onBook, busy = false }) {
             src={ev.imageUrl}
             alt={ev.name}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         </figure>
       )}
+
       <div className="card-body">
         <div className="flex items-start justify-between gap-2">
           <h3 className="card-title text-base leading-tight">{ev.name}</h3>
-          <span className="badge badge-outline shrink-0">{label}</span>
+          <div className="flex items-center gap-2">
+            <span className="badge badge-outline">{label}</span>
+          </div>
         </div>
 
         <p className="text-sm opacity-80">{ev.city}</p>
         <p className="text-xs opacity-70">{prettyWhen(ev.startDateTime)}</p>
+        <h3 className="text-m">{priceText}</h3>
 
         <div className="card-actions justify-between mt-2">
           <a
