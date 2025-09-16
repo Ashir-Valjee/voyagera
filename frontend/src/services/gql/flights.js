@@ -38,6 +38,14 @@ export const AMADEUS_FLIGHT_OFFERS = gql`
       retCarrierCode
       retFlightNumber
       retStops
+      outDurationIso
+      outDurationMinutes
+      outDurationHours
+      retDurationIso
+      retDurationMinutes
+      retDurationHours
+      totalDurationMinutes
+      totalDurationHours
     }
   }
 `;
