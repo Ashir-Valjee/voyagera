@@ -11,7 +11,9 @@ def test_profile_creation_defaults():
     profile = Profile.objects.create(user=user)
 
     assert profile.user == user
-    assert profile.profile_pic_url == "https://upload.wikimedia.org/wikipedia/commons/8/89/Portrait_Placeholder.png"
+    assert profile.profile_pic.name == "profile_pics/Portrait_Placeholder.png"
+    assert profile.first_name is None
+    assert profile.last_name is None
     assert profile.home_city is None
     assert profile.likes_music is False
     assert profile.likes_sports is False
@@ -22,9 +24,11 @@ def test_profile_creation_defaults():
 @pytest.mark.django_db
 def test_profile_str_method():
     user = User.objects.create_user(username="struser", password="password")
-    profile = Profile.objects.create(user=user)
+    profile = Profile.objects.create(user=user, first_name="John", last_name="Doe")
     expected_string = f"Profile<{user.id}>"
     assert str(profile) == expected_string
+    assert profile.first_name == "John"
+    assert profile.last_name == "Doe"
 
 @pytest.mark.django_db
 def test_profile_with_home_city():

@@ -1,5 +1,5 @@
 import { apollo } from "../lib/apollo";
-import { Cities } from "../gql/city"
+import { Cities } from "./gql/city"
 
 
 export async function fetchCities() {

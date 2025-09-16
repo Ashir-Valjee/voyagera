@@ -9,14 +9,17 @@ class Profile(models.Model):
         related_name="profile",
     )
 
-    profile_pic = models.ImageField(upload_to='profile_pics/', blank=True, default="profile_pics/Portrait_Placeholder.png")
-
+    profile_pic = models.CharField(max_length=500, blank=True, null=True)
+    
     home_city = models.ForeignKey( 
         City,
         null = True,
         blank = True,
         on_delete=models.PROTECT
     )
+
+    first_name = models.CharField(max_length=150, null=True, blank=True, default=None)
+    last_name = models.CharField(max_length=150, null=True, blank=True, default=None)
 
     likes_music = models.BooleanField(default=False)
     likes_sports = models.BooleanField(default=False)
