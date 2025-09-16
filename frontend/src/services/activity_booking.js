@@ -43,7 +43,8 @@ export async function createActivityBooking(
   activityName,
   activityUrl,
   totalPrice,
-  flightBookingId
+  flightBookingId,
+  imageUrl
 ) {
   const { data } = await apollo.mutate({
     mutation: CreateActivityBooking,
@@ -54,8 +55,9 @@ export async function createActivityBooking(
       category,
       activityName,
       activityUrl,
-      totalPrice,
+      totalPrice: String(totalPrice),
       flightBookingId,
+      imageUrl,
     },
   });
   return data?.createActivityBooking ?? null;

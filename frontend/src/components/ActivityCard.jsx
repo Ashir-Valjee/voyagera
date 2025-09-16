@@ -1,6 +1,6 @@
 import { prettyWhen } from "../utils/helpers";
 
-export default function ActivityCard({ ev }) {
+export default function ActivityCard({ ev, onBook, busy = false }) {
   // ev: { id, name, city, classificationName, startDateTime, imageUrl, eventUrl }
 
   return (
@@ -27,15 +27,30 @@ export default function ActivityCard({ ev }) {
         <p className="text-sm opacity-80">{ev.city}</p>
         <p className="text-xs opacity-70">{prettyWhen(ev.startDateTime)}</p>
 
-        <div className="card-actions justify-end mt-2">
+        <div className="card-actions justify-between mt-2">
           <a
-            className="btn btn-sm btn-primary"
+            className="btn btn-sm"
             href={ev.eventUrl}
             target="_blank"
             rel="noreferrer"
           >
-            View
+            Details
           </a>
+
+          <button
+            className={`btn btn-sm btn-primary ${busy ? "btn-disabled" : ""}`}
+            onClick={() => onBook?.(ev)}
+            disabled={busy}
+            title="Save this activity"
+          >
+            {busy ? (
+              <>
+                <span className="loading loading-spinner loading-xs" /> Booking…
+              </>
+            ) : (
+              "Book"
+            )}
+          </button>
         </div>
       </div>
     </li>
