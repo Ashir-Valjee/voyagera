@@ -3,6 +3,7 @@ import Profile from "../components/Profile";
 import { fetchUserProfile, updateUserProfile, uploadProfilePicture } from "../services/profile";
 import { fetchFlightBookings, deleteFlightBooking} from "../services/flights";
 import { fetchCities } from "../services/city";
+import { useAuth } from "../contexts/AuthContext";
 import { fetchActivityBookingsByUser } from '../services/activity_booking';
 
 const ProfilePage = () => {
@@ -10,31 +11,43 @@ const ProfilePage = () => {
     const [cities, setCities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    
+    const { isAuthenticated } = useAuth(); // Just get authentication status
 
     useEffect(() => {
-    // Use Promise.all to run both fetches at the same time
-    Promise.all([
-        fetchUserProfile(),
-        fetchFlightBookings(),
-        fetchCities(),
-        fetchActivityBookingsByUser()
-    ])
-    .then(([profileData, flightBookingsData, citiesData, activityBookingsData]) => {
-        setProfile({
-            ...profileData,
-            flightBookings: flightBookingsData || [],
-            activityBookings: activityBookingsData || []
+        if (!isAuthenticated) {
+            setLoading(false);
+            setError("Please log in to view your profile");
+            return;
+        }
+
+        // Only fetch data if authenticated
+        setLoading(true);
+        setError(null);
+        
+        Promise.all([
+            fetchUserProfile(),
+            fetchFlightBookings(),
+            fetchCities(),
+            fetchActivityBookingsByUser()
+        ])
+        .then(([profileData, flightBookingsData, citiesData, activityBookingsData]) => {
+            setProfile({
+                ...profileData,
+                flightBookings: flightBookingsData || [], 
+                activityBookings: activityBookingsData || []
+
+            });
+            setCities(citiesData || []);
+        })
+        .catch(err => {
+            console.error("Failed to fetch profile data:", err);
+            setError(err.message);
+        })
+        .finally(() => {
+            setLoading(false);
         });
-        setCities(citiesData || []);
-    })
-    .catch(err => {
-        console.error("Failed to fetch profile data:", err);
-        setError(err.message);
-    })
-    .finally(() => {
-        setLoading(false);
-    });
-    }, []); 
+    }, [isAuthenticated]); // Re-run when authentication changes
 
     const handleUpdate = async (profileInfo) => {
         // console.log('ProfileInfo received:', profileInfo);
@@ -101,8 +114,13 @@ const ProfilePage = () => {
     };
 
     if (loading) return <p className="text-center p-8">Loading your profile...</p>;
-    if (error) return <p className="text-center p-8">Error: {error}</p>;
-
+    
+    if (error) return (
+        <div className="text-center p-8">
+            <p className="text-xl mb-4">Error: {error}</p>
+            {!isAuthenticated && <p>Please sign in using the navigation bar.</p>}
+        </div>
+    );
 
     return (
         <>
@@ -115,7 +133,7 @@ const ProfilePage = () => {
                 />
             </div>
         </>
-    )
-}
+    );
+};
 
 export default ProfilePage;
