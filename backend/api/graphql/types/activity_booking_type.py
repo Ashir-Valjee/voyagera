@@ -14,5 +14,6 @@ class ActivityBookingType(DjangoObjectType):
             "activity_name",
             "activity_url",
             "total_price",
-            "flight_booking"
+            "flight_booking",
+            "image_url"
         )
