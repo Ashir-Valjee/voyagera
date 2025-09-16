@@ -1,17 +1,13 @@
 import { apollo } from "../lib/apollo";
-<<<<<<< HEAD
 import {
   SingleActivityBooking,
-  ActivityBookingByFlight,
+  ActivityBookingsByFlight,
   CreateActivityBooking,
   DeleteActivityBooking,
   UpdateActivityBooking,
   TICKETMASTER_EVENTS,
+  ActivityBookingsByUser,
 } from "./gql/activity_booking";
-=======
-import { SingleActivityBooking, ActivityBookingsByFlight, CreateActivityBooking, DeleteActivityBooking, UpdateActivityBooking, ActivityBookingsByUser } from "./gql/activity_booking";
-
->>>>>>> main
 
 export async function fetchSingleActivityBooking(id) {
   const { data } = await apollo.query({
@@ -23,29 +19,20 @@ export async function fetchSingleActivityBooking(id) {
 }
 
 export async function fetchActivityBookingByFlight(flightBookingId) {
-<<<<<<< HEAD
   const { data } = await apollo.query({
-    query: ActivityBookingByFlight,
+    query: ActivityBookingsByFlight,
     variables: { flightBookingId },
     fetchPolicy: "network-only",
   });
-  return data?.activityBookingByFlightId ?? null;
-=======
-    const { data } = await apollo.query({
-        query: ActivityBookingsByFlight,
-        variables: {flightBookingId},
-        fetchPolicy: "network-only",
-    });
-    return data?.activityBookingsByFlightId ?? null;
+  return data?.activityBookingsByFlightId ?? null;
 }
 
-export async function fetchActivityBookingsByUser(){
+export async function fetchActivityBookingsByUser() {
   const { data } = await apollo.query({
-        query: ActivityBookingsByUser,
-        fetchPolicy: "network-only",
-    });
-    return data?.activityBookingsByUser ?? null;
->>>>>>> main
+    query: ActivityBookingsByUser,
+    fetchPolicy: "network-only",
+  });
+  return data?.activityBookingsByUser ?? null;
 }
 
 export async function createActivityBooking(
