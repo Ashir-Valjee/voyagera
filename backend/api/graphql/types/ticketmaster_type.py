@@ -10,3 +10,6 @@ class TicketmasterType(graphene.ObjectType):
     country = graphene.String()
     image_url = graphene.String()
     event_url = graphene.String()
+    price_min = graphene.Float()
+    price_max = graphene.Float()
+    price_currency = graphene.String()
