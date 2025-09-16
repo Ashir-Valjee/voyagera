@@ -57,7 +57,11 @@ export async function createActivityBooking(
       activityUrl,
       totalPrice: String(totalPrice),
       flightBookingId,
+<<<<<<< HEAD
       imageUrl,
+=======
+      imageUrl
+>>>>>>> activity-profile-section
     },
   });
   return data?.createActivityBooking ?? null;

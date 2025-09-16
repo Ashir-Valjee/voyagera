@@ -78,6 +78,7 @@ class UpdateFlightBookingMutation(graphene.Mutation):
             success=True,
             errors=[]
         )
+        
 class DeleteFlightBookingMutation(graphene.Mutation):
     flight_booking = graphene.Field(FlightBookingType)
     success = graphene.Boolean()
