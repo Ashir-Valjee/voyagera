@@ -1,4 +1,4 @@
-
+import { Pencil, Trash2} from 'lucide-react'
 const FlightBookings = ({ bookings }) => {
     if (!bookings || bookings.length === 0) {
         return <p className="text-center text-base-content/60">No flights booked yet.</p>;
@@ -35,8 +35,15 @@ const FlightBookings = ({ bookings }) => {
                             </div>
                         </div>
                         <div className="card-actions justify-end p-4">
-                            <button className="btn btn-primary btn-sm">Edit Booking</button>
-                            <button className="btn btn-outline btn-sm ml-2">Delete Booking</button>
+                            <button className="btn btn-primary btn-sm"> 
+                                <Pencil className='w-4 h-4' />
+                            </button>
+                            <button className="btn btn-outline btn-sm ml-2">
+                                <Trash2 className='w-4 h-4'/>
+                            </button>
+                            <button className="btn btn-outline btn-sm ml-2">
+                                View Activities
+                            </button>
                         </div>
                     </div>
                 ))}

@@ -182,7 +182,10 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
                 <FlightBookings bookings={initialProfile?.flightBookings} />
             )}
             {activeTab === "activities" && (
-                <ActivityBookings bookings={initialProfile?.activityBookings} />
+                <>
+                <input type="checkbox" defaultChecked className="toggle" />
+                <ActivityBookings bookings={initialProfile?.activityBookings}/>
+                </>
             )}
             </div>
 
