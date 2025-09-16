@@ -7,7 +7,7 @@ const FlightBookings = ({ bookings }) => {
     return (
         <div>
             <div className="divider"></div>
-            <h3 className="text-xl font-semibold text-center mt-4">My Flight Bookings ✈️</h3>
+            {/* <h3 className="text-xl font-semibold text-center mt-4">My Flight Bookings ✈️</h3> */}
 
             <div className="space-y-2 mt-4">
                 {bookings.map((booking) => (

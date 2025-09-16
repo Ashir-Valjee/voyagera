@@ -168,10 +168,10 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
                 <div className='tabs justify-center'>
 
                     <button className={`tab tab-bordered ${activeTab === "flights" ? "tab-active" : ""}`} onClick={() => setActiveTab("flights")}>
-                        Flight Bookings
+                        My Flight Bookings ✈️
                     </button>
                     <button className={`tab tab-bordered ${activeTab === "activities" ? "tab-active" : ""}`} onClick={() => setActiveTab("activities")}>
-                        Activity Bookings
+                        My Activity Bookings
                     </button>
                     
                 </div>
