@@ -142,7 +142,6 @@ export default function Activities() {
           new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime()
       )[0];
 
-      // 3) create the activity booking with UPPERCASE category
       const categoryUpper = (ev.uiCategory || "Family").toUpperCase();
 
       const res = await createActivityBooking(
