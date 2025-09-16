@@ -9,9 +9,10 @@ def test_profile_creation_defaults():
     user = User.objects.create_user(username="defaultuser", password="password")
 
     profile = Profile.objects.create(user=user)
+    profile.refresh_from_db()
 
     assert profile.user == user
-    assert profile.profile_pic.name == "profile_pics/Portrait_Placeholder.png"
+    assert profile.profile_pic is None
     assert profile.first_name is None
     assert profile.last_name is None
     assert profile.home_city is None
