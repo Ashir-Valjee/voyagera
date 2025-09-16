@@ -1,0 +1,34 @@
+/* HeroSection.css */
+
+.hero {
+    position: relative;
+    overflow: hidden; /* allows the image to move without being clipped */
+    min-height: 70vh;
+}
+
+.hero-background {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    animation: cinematic-zoom-pan 40s ease-in-out infinite;
+    transform-origin: center center; /* zoom from the center */
+}
+
+@keyframes cinematic-zoom-pan {
+    0% {
+        transform: scale(1) translate(0, 0) rotate(0deg);
+    }
+    25% {
+        transform: scale(1.1) translate(30px, -20px) rotate(1deg);
+    }
+    50% {
+        transform: scale(1.15) translate(-40px, 30px) rotate(-1deg);
+    }
+    75% {
+        transform: scale(1.1) translate(20px, -10px) rotate(0.5deg);
+    }
+    100% {
+        transform: scale(1) translate(0, 0) rotate(0deg);
+    }
+}
+

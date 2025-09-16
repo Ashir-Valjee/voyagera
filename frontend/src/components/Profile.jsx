@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
 import PlaceholderImage from "../assets/Portrait_Placeholder.png"
+import FlightBookings from './FlightBookingProfile'
+import { FlightBooking } from '../services/gql/flights';
+import ActivityBookings from './ActivityProfile';
 
 const Profile = ({ initialProfile, cities = [], onUpdate }) => {
     const [profile, setProfile] = useState(initialProfile || {
@@ -15,6 +18,8 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
         likesFamily: false,
     });
 
+    const[activeTab, setActiveTab] = useState("flights");
+
     useEffect(() => {
         if (initialProfile) {
             setProfile(initialProfile);
@@ -24,7 +29,7 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (file) {
-            const updatedProfile = { ...profile, profilePice: file };
+            const updatedProfile = { ...profile, profilePic: file };
         setProfile(updatedProfile);
         handleAutoSave('profilePic', file);
         }
@@ -77,12 +82,9 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
                         <div className="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
                             <img
                                 src={
-                                    // 1. If it's a File, create a temporary preview URL
                                     profile.profilePic instanceof File
                                         ? URL.createObjectURL(profile.profilePic)
-                                        // 2. If not a file, check if profile.profilePic is a non-empty string
                                         : profile.profilePic 
-                                            // 3. If yes, use it. If no (it's null/empty), use the placeholder.
                                             ? profile.profilePic 
                                             : PlaceholderImage
                                 }
@@ -161,50 +163,33 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
                 </div>
             </div>
 
-            {/* Booked Flights */}
-            <div className="divider"></div>
-            <h3 className="text-xl font-semibold text-center mt-4">My Flight Bookings ✈️</h3>
-            
-            <div className="space-y-2">
-                    {initialProfile?.flightBookings?.length > 0 ? (
-                        <>
-                            {initialProfile.flightBookings.map(booking => (
-                                <div key={booking.id} className="card bg-base-200 shadow-md mb-8">
-                                    <div className="card-header px-4 py-2 bg-primary text-primary-content rounded-t">
-                                        <h4 className="text-lg font-semibold">
-                                            {booking.departureCity?.city} to {booking.destinationCity?.city}
-                                        </h4>
-                                    </div>
-                                    <div className="card-body p-4">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div>
-                                                <p><strong>Departure Airport:</strong> {booking.departureAirport}</p>
-                                                <p><strong>Departure Date & Time:</strong> {new Date(booking.departureDateTime).toLocaleString()}</p>
-                                                <p><strong>Arrival Airport:</strong> {booking.destinationAirport}</p>
-                                                <p><strong>Arrival Date & Time:</strong> {new Date(booking.arrivalDateTime).toLocaleString()}</p>
-                                            </div>
-                                            <div>
-                                                <p><strong>Flight Duration:</strong> {booking.flightDuration} hours</p>
-                                                <p><strong>Number of Stops:</strong> {booking.numberOfStops}</p>
-                                                <p><strong>Passengers:</strong> {booking.numberOfPassengers}</p>
-                                                <p><strong>Total Price:</strong> £{booking.totalPrice}</p>
-                                                <p><strong>Booked On:</strong> {new Date(booking.dateCreated).toLocaleDateString()}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className="card-actions justify-end p-4">
-                                        <button className="btn btn-primary btn-sm">Book Activities</button>
-                                        <button className="btn btn-outline btn-sm ml-2">Show My Activities</button>
-                                    </div>
-                                </div>
-                            ))}
-                        </>
-                    ) : (
-                        <p className="text-center text-base-content/60">No flights booked yet.</p>
-                    )}
+            {/* Tabs */}
+            <div className='mt-8'>
+                <div className='tabs justify-center'>
+
+                    <button className={`tab tab-bordered ${activeTab === "flights" ? "tab-active" : ""}`} onClick={() => setActiveTab("flights")}>
+                        My Flight Bookings ✈️
+                    </button>
+                    <button className={`tab tab-bordered ${activeTab === "activities" ? "tab-active" : ""}`} onClick={() => setActiveTab("activities")}>
+                        My Activity Bookings
+                    </button>
+                    
+                </div>
             </div>
 
+            <div className="mt-6">
+            {activeTab === "flights" && (
+                <FlightBookings bookings={initialProfile?.flightBookings} />
+            )}
+            {activeTab === "activities" && (
+                <>
+                <input type="checkbox" defaultChecked className="toggle" />
+                <ActivityBookings bookings={initialProfile?.activityBookings}/>
+                </>
+            )}
             </div>
+
+            </div> 
         </div>
     );
 };

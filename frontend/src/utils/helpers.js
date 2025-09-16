@@ -91,3 +91,41 @@ export function resolveCityName(destinationParam, cities) {
 
   return destRaw;
 }
+
+// local tiny helper: ensure a DateTime string for our mutation
+export function ensureDateTimeZ(s) {
+  if (!s) return null;
+  if (!s.includes("T")) return `${s}T12:00:00Z`;
+  return s.endsWith("Z") ? s : `${s}Z`;
+}
+
+/** Map Ticketmaster classification -> one of our 5 UI categories (default Family). */
+export function normalizeCategory(tmName) {
+  const t = String(tmName || "")
+    .trim()
+    .toLowerCase();
+  if (t.startsWith("music")) return "Music";
+  if (t.startsWith("sport")) return "Sports";
+  if (t.startsWith("arts")) return "Arts"; // "Arts & Theatre"
+  if (t.includes("theatre") || t.includes("theater")) return "Arts";
+  if (t === "film" || t.startsWith("movie") || t.includes("cinema"))
+    return "Film";
+  if (t === "family") return "Family";
+  // everything else buckets into Family
+  return "Family";
+}
+
+/** Map our UI filter back to Ticketmaster segment for the query. */
+export function toTicketmasterFilter(uiCategory) {
+  switch (uiCategory) {
+    case "Arts":
+      return "Arts & Theatre";
+    case "Music":
+    case "Sports":
+    case "Film":
+    case "Family":
+      return uiCategory;
+    default:
+      return undefined; // All
+  }
+}

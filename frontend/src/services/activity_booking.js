@@ -43,7 +43,8 @@ export async function createActivityBooking(
   activityName,
   activityUrl,
   totalPrice,
-  flightBookingId
+  flightBookingId,
+  imageUrl
 ) {
   const { data } = await apollo.mutate({
     mutation: CreateActivityBooking,
@@ -54,8 +55,9 @@ export async function createActivityBooking(
       category,
       activityName,
       activityUrl,
-      totalPrice,
+      totalPrice: String(totalPrice),
       flightBookingId,
+      imageUrl,
     },
   });
   return data?.createActivityBooking ?? null;
@@ -79,6 +81,7 @@ export async function deleteActivityBooking(id) {
 
 export async function fetchTicketmasterEvents({
   city,
+  countryCode,
   startDateTime,
   endDateTime,
   classificationName,
@@ -88,6 +91,7 @@ export async function fetchTicketmasterEvents({
     query: TICKETMASTER_EVENTS,
     variables: {
       city,
+      countryCode,
       startDateTime,
       endDateTime,
       classificationName: classificationName || undefined,

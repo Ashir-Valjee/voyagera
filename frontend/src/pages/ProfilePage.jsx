@@ -4,6 +4,7 @@ import { fetchUserProfile, updateUserProfile, uploadProfilePicture } from "../se
 import { fetchFlightBookings } from "../services/flights";
 import { fetchCities } from "../services/city";
 import { useAuth } from "../contexts/AuthContext";
+import { fetchActivityBookingsByUser } from '../services/activity_booking';
 
 const ProfilePage = () => {
     const [profile, setProfile] = useState(null);
@@ -27,12 +28,15 @@ const ProfilePage = () => {
         Promise.all([
             fetchUserProfile(),
             fetchFlightBookings(),
-            fetchCities()
+            fetchCities(),
+            fetchActivityBookingsByUser()
         ])
-        .then(([profileData, flightBookingsData, citiesData]) => {
+        .then(([profileData, flightBookingsData, citiesData, activityBookingsData]) => {
             setProfile({
                 ...profileData,
                 flightBookings: flightBookingsData || [], 
+                activityBookings: activityBookingsData || []
+
             });
             setCities(citiesData || []);
         })
@@ -46,37 +50,53 @@ const ProfilePage = () => {
     }, [isAuthenticated]); // Re-run when authentication changes
 
     const handleUpdate = async (profileInfo) => {
-        const updatedData = { ...profile, ...profileInfo };
+        // console.log('ProfileInfo received:', profileInfo);
         
         try {
             const variables = {
-                firstName: updatedData.firstName,
-                lastName: updatedData.lastName,
-                homeCityId: updatedData.homeCity?.id,
-                likesMusic: updatedData.likesMusic,
-                likesSports: updatedData.likesSports,
-                likesArts: updatedData.likesArts,
-                likesFilm: updatedData.likesFilm,
-                likesFamily: updatedData.likesFamily,
+                firstName: profileInfo.firstName,
+                lastName: profileInfo.lastName,
+                homeCityId: profileInfo.homeCity?.id,
+                likesMusic: profileInfo.likesMusic,
+                likesSports: profileInfo.likesSports,
+                likesArts: profileInfo.likesArts,
+                likesFilm: profileInfo.likesFilm,
+                likesFamily: profileInfo.likesFamily,
             };
 
-            if (profileInfo.profile_pic instanceof File) {
-                const uploadResult = await uploadProfilePicture(profileInfo.profile_pic);
-                variables.profilePic = uploadResult.fileUrl;
+            if (profileInfo.profilePic instanceof File) {
+                // console.log('Uploading file:', profileInfo.profilePic.name);
+                const uploadResult = await uploadProfilePicture(profileInfo.profilePic);
+                // console.log('Upload result:', uploadResult);
+
+                if (uploadResult.fileUrl) {
+                        variables.profilePic = uploadResult.fileUrl;
+                } else {
+                    throw new Error('File upload failed - no URL returned');
+                }
             }
+            // console.log('Mutation variables:', variables);
 
             const result = await updateUserProfile(variables);
+            // console.log('Mutation result:', result);
 
             if (result && result.success) {
                 setProfile(prevProfile => ({
                     ...prevProfile,
-                    ...result.profile
+                    ...result.profile,
+                    flightBookings: prevProfile.flightBookings,
+                    activityBookings: prevProfile.activityBookings
                 }));
+                return { success: true, profile: result.profile };
             } else {
+                const errors = result?.errors || ['Update failed'];
                 setError(result?.errors?.join(', '));
+                return { success: false, errors };
             }
         } catch (err) {
+            console.error('Profile update error:', err);
             setError(err.message);
+            return { success: false, errors: [err.message] };
         }
     };
 
