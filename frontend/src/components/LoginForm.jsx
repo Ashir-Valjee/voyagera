@@ -1,26 +1,25 @@
 import { useState } from "react";
-import { login } from "../services/auth";
-import fetchMe from "../services/user";
+import { useAuth } from "../contexts/AuthContext";
 
 export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [welcomeName, setWelcomeName] = useState(null);
+  
+  const { login } = useAuth(); // Use our AuthContext login function
 
   async function onSubmit(e) {
     e.preventDefault();
     setLoading(true);
     setError(null);
     try {
-      // 1) login → stores tokens in localStorage
+      // Use the AuthContext login function
       await login(email, password);
-
-      // 2) fetch current user (Apollo now sends Authorization header)
-      const me = await fetchMe();
-      const name = me?.username || me?.email || "there";
-      setWelcomeName(name);
+      
+      // Close the modal on successful login
+      document.getElementById('my_modal_5').close();
+      
     } catch (err) {
       setError(err.message || "Login failed");
     } finally {
@@ -73,12 +72,6 @@ export default function LoginForm() {
           )}
         </fieldset>
       </form>
-
-      {welcomeName && (
-        <div className="alert alert-success">
-          <span>welcome {welcomeName}</span>
-        </div>
-      )}
     </div>
   );
 }
