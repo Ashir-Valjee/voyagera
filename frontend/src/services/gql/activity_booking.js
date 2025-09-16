@@ -15,6 +15,7 @@ export const SingleActivityBooking = gql`
   }
 `;
 
+<<<<<<< HEAD
 export const ActivityBookingByFlight = gql`
   query GetActivityBookingsByFlightId($flightBookingId: Int!) {
     activityBookingByFlightId(flightBookingId: $flightBookingId) {
@@ -26,6 +27,41 @@ export const ActivityBookingByFlight = gql`
       activityName
       activityUrl
       totalPrice
+=======
+export const ActivityBookingsByFlight = gql`
+  query GetActivityBookingsByFlightId($flightBookingId: Int!){
+    activityBookingsByFlightId(flightBookingId: $flightBookingId){
+        id
+        dateCreated
+        activityDateTime
+        numberOfPeople
+        category
+        activityName
+        activityUrl
+        totalPrice
+>>>>>>> main
+    }
+  }
+`;
+
+export const ActivityBookingsByUser = gql`
+  query ActivityBookingsByUser {
+    activityBookingsByUser {
+        id
+        activityDateTime
+        numberOfPeople
+        category
+        activityName
+        activityUrl
+        totalPrice
+        flightBooking {
+            id
+            destinationCity {
+                id
+                country
+                city
+            }
+        }
     }
   }
 `;
@@ -94,6 +130,7 @@ export const UpdateActivityBooking = gql`
         numberOfPeople
         totalPrice
       }
+
     }
   }
 `;

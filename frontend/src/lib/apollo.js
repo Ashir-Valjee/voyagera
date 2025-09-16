@@ -6,7 +6,9 @@ import {
   ApolloLink,
 } from "@apollo/client";
 
-const httpLink = new HttpLink({ uri: "/graphql/" });
+const httpLink = new HttpLink({ 
+  uri: "/graphql/",
+});
 
 const authLink = new ApolloLink((operation, forward) => {
   const token = localStorage.getItem("access");

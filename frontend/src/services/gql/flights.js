@@ -56,6 +56,16 @@ export const FlightBooking = gql`
       id
       departureAirport
       destinationAirport
+      departureCity {
+        id
+        city
+        country
+      }
+      destinationCity {
+        id
+        city
+        country
+      }
       dateCreated
       departureDateTime
       arrivalDateTime
@@ -73,6 +83,16 @@ export const FlightBookingById = gql`
       id
       departureAirport
       destinationAirport
+      departureCity {
+        id
+        city
+        country
+      }
+      destinationCity {
+        id
+        city
+        country
+      }
       dateCreated
       departureDateTime
       arrivalDateTime

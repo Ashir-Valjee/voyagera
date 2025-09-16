@@ -7,7 +7,7 @@ import App from "./App";
 import HomePage from "./pages/HomePage.jsx"
 import SignupPage from "./pages/SignupPage.jsx"
 import Results from "./pages/Results.jsx";
-import Profile from "./pages/Profile.jsx"
+import ProfilePage from "./pages/ProfilePage.jsx"
 import ErrorPage from "./pages/ErrorPage.jsx";
 
 const router = createBrowserRouter([
@@ -30,7 +30,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/profile",
-        element: <Profile />, 
+        element: <ProfilePage />, 
       },
     ]
   },
