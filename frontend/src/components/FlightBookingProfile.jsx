@@ -1,11 +1,13 @@
 import { Pencil, Trash2} from 'lucide-react'
 import { useState } from "react";
-import { deleteFlightBooking } from "../services/flights";
+import { deleteFlightBooking, updateFlightBooking } from "../services/flights";
 
 
-const FlightBookings = ({ bookings, onDelete }) => {
+const FlightBookings = ({ bookings, onDelete, onUpdate }) => {
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [editingBooking, setEditingBooking] = useState(null);
+    const [editPassengers, setEditPassengers] = useState(0);
 
     const handleDelete = async () => {
         if (!selectedBooking) return;
@@ -25,6 +27,36 @@ const FlightBookings = ({ bookings, onDelete }) => {
         setSelectedBooking(null); // close modal
         }
     };
+
+    const handleEditClick = (booking) => {
+    setEditingBooking(booking);
+    setEditPassengers(booking.numberOfPassengers);
+    };
+
+    const handleUpdate = async () => {
+    if (!editingBooking) return;
+    try {
+        setLoading(true);
+        const pricePerPassenger = editingBooking.totalPrice / editingBooking.numberOfPassengers;
+        const newTotalPrice = pricePerPassenger * editPassengers;
+
+        const updatedBooking = await updateFlightBooking(
+        editingBooking.id,
+        editPassengers,
+        newTotalPrice
+        );
+
+        // update parent state properly (not onDelete, since that’s for deleting)
+        if (updatedBooking?.flight_booking && onUpdate) {
+            onUpdate(updatedBooking.flight_booking);
+        }
+    } catch (err) {
+        console.error("Failed to update booking:", err);
+    } finally {
+        setLoading(false);
+        setEditingBooking(null);
+    }
+};
     
     if (!bookings || bookings.length === 0) {
         return <p className="text-center text-base-content/60">No flights booked yet.</p>;
@@ -61,7 +93,7 @@ const FlightBookings = ({ bookings, onDelete }) => {
                             </div>
                         </div>
                         <div className="card-actions justify-end p-4">
-                            <button className="btn btn-primary btn-sm"> 
+                            <button className="btn btn-primary btn-sm" onClick={() => handleEditClick(booking)}> 
                                 <Pencil className='w-4 h-4' />
                             </button>
                             <button
@@ -78,7 +110,43 @@ const FlightBookings = ({ bookings, onDelete }) => {
             ))}
         </div>
 
-        {/* Confirmation Modal */}
+
+        {/* Update Modal */}
+            {editingBooking && (
+            <div className="modal modal-open">
+            <div className="modal-box">
+            <h3 className="font-bold text-lg">Edit Booking</h3>
+            <div className="py-4 space-y-2">
+            <label>
+            Number of Passengers:
+            <input
+                type="number"
+                value={editPassengers}
+                onChange={(e) => setEditPassengers(Number(e.target.value))}
+                className="input input-bordered w-full"
+                min="1"
+            />
+            </label>
+            <p className="font-bold text-xl mt-4">
+                New Total Price: £
+            {((editingBooking.totalPrice / editingBooking.numberOfPassengers) * editPassengers).toFixed(2)}
+            </p>
+
+        </div>
+        <div className="modal-action">
+            <button className={`btn btn-primary ${loading ? "loading" : ""}`} onClick={handleUpdate}>
+            {loading ? "Updating..." : "Save Changes"}
+            </button>
+            <button className="btn" onClick={() => setEditingBooking(null)} disabled={loading}>
+            Cancel
+            </button>
+        </div>
+        </div>
+    </div>
+    )}
+
+
+        {/* Delete Modal */}
         {selectedBooking && (
             <div className="modal modal-open">
             <div className="modal-box">
