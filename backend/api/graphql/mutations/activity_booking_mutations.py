@@ -19,6 +19,7 @@ class CreateActivityBookingMutation(graphene.Mutation):
         activity_url = graphene.String(required=True)
         total_price = graphene.Decimal(required=True)
         flight_booking_id = graphene.ID(required=True)
+        image_url = graphene.String(required=True)
         
     @classmethod
     def mutate(cls, root, info, **kwargs):
@@ -34,7 +35,8 @@ class CreateActivityBookingMutation(graphene.Mutation):
             activity_name=kwargs.get("activity_name"),
             activity_url=kwargs.get("activity_url"),
             total_price=kwargs.get("total_price"),
-            flight_booking=flight_booking
+            flight_booking=flight_booking,
+            image_url=kwargs.get("image_url")
         )
         
         return CreateActivityBookingMutation(

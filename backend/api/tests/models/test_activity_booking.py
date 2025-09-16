@@ -39,13 +39,15 @@ def test_activity_booking_creation(booking_setup):
         category="Tour",
         activity_name="Eiffel Tower Tour",
         activity_url="http://example.com",
-        total_price=Decimal("50.00")
+        total_price=Decimal("50.00"),
+        image_url="http://example.com"
     )
 
     assert ActivityBooking.objects.count() == 1
     assert activity.flight_booking == flight_booking
     assert activity.location_city.city == "Paris"
     assert activity.activity_name == "Eiffel Tower Tour"
+    assert activity.image_url == "http://example.com"
     
 @pytest.mark.django_db
 def test_activity_booking_defaults(booking_setup):
@@ -59,7 +61,8 @@ def test_activity_booking_defaults(booking_setup):
         category="Tour",
         activity_name="Louvre Museum Visit",
         activity_url="http://example.com",
-        total_price=Decimal("75.00")
+        total_price=Decimal("75.00"),
+        image_url="http://example.com"
     )
 
     assert activity.number_of_people == 1
@@ -75,7 +78,8 @@ def test_flight_booking_deletion_cascades(booking_setup):
         category="Tour",
         activity_name="Seine River Cruise",
         activity_url="http://example.com",
-        total_price=Decimal("25.00")
+        total_price=Decimal("25.00"),
+        image_url="http://example.com"
     )
     assert ActivityBooking.objects.count() == 1
 
