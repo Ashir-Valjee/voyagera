@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
-import { fetchCities } from "../services/cities";
-
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { searchFlights, createFlightBooking } from "../services/flights";
+import { fetchCities } from "../services/cities";
 import FlightCard from "./FlightCard";
+import { computeMinutesBetween } from "../utils/helpers";
 
 export default function FlightResults({
   offers,
@@ -12,12 +12,34 @@ export default function FlightResults({
   setLoading,
   err,
   setErr,
-  paramsKey, // from parent
+  paramsKey,
   lastKey,
   setLastKey,
 }) {
   const [params] = useSearchParams();
-  const [bookingBusy, setBookingBusy] = useState(false);
+  const navigate = useNavigate();
+
+  const [showSearch, setShowSearch] = useState(false);
+  const [origin, setOrigin] = useState("");
+  const [destination, setDestination] = useState("");
+  const [departureDate, setDepartureDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
+  const [adults, setAdults] = useState(1);
+
+  const [bookingBusyId, setBookingBusyId] = useState(null);
+
+  function loadFormFromParams() {
+    setOrigin((params.get("origin") || "").toUpperCase());
+    setDestination((params.get("destination") || "").toUpperCase());
+    setDepartureDate(params.get("departureDate") || "");
+    setReturnDate(params.get("returnDate") || "");
+    setAdults(Number(params.get("adults") || 1));
+  }
+
+  const toggleSearch = () => {
+    if (!showSearch) loadFormFromParams();
+    setShowSearch((s) => !s);
+  };
 
   useEffect(() => {
     if (lastKey === paramsKey && offers.length > 0) return;
@@ -28,14 +50,14 @@ export default function FlightResults({
       setLoading(true);
       setErr(null);
       try {
-        const origin = (params.get("origin") || "").toUpperCase();
-        const destination = (params.get("destination") || "").toUpperCase();
-        const departureDate = params.get("departureDate") || "";
-        const returnDate = params.get("returnDate") || undefined;
-        const adults = Number(params.get("adults") || 1);
-        const nonStop = params.get("nonStop") === "true";
+        const o = (params.get("origin") || "").toUpperCase();
+        const d = (params.get("destination") || "").toUpperCase();
+        const dep = params.get("departureDate") || "";
+        const ret = params.get("returnDate") || undefined;
+        const a = Number(params.get("adults") || 1);
+        const ns = true;
 
-        if (!origin || !destination || !departureDate) {
+        if (!o || !d || !dep) {
           if (!cancelled) {
             setOffers([]);
             setLastKey(paramsKey);
@@ -45,18 +67,18 @@ export default function FlightResults({
         }
 
         const res = await searchFlights({
-          origin,
-          destination,
-          departureDate,
-          returnDate,
-          adults,
-          nonStop,
+          origin: o,
+          destination: d,
+          departureDate: dep,
+          returnDate: ret,
+          adults: a,
+          nonStop: ns,
           maxResults: 20,
           currency: "GBP",
         });
 
         if (!cancelled) {
-          setOffers(res);
+          setOffers(res || []);
           setLastKey(paramsKey);
         }
       } catch (e) {
@@ -71,82 +93,169 @@ export default function FlightResults({
     };
   }, [paramsKey]);
 
-  const handleSelect = async (offer) => {
+  function minutesToHoursStr(mins) {
+    if (!mins && mins !== 0) return "0";
+    const hours = Math.round((mins / 60) * 100) / 100;
+    return String(hours);
+  }
+
+  async function handleSelect(offer) {
     try {
-      setBookingBusy(true);
+      setBookingBusyId(offer.id);
 
-      const originCityCode = (params.get("origin") || "").toUpperCase();
-      const destinationCityCode = (
-        params.get("destination") || ""
-      ).toUpperCase();
-      const passengers = Number(params.get("adults") || 1);
-
-      if (!originCityCode || !destinationCityCode) {
-        throw new Error(
-          "Missing origin/destination in the URL. Please start a new search."
-        );
-      }
+      const originParam = (params.get("origin") || "").toUpperCase();
+      const destParam = (params.get("destination") || "").toUpperCase();
+      const adultsParam = Number(params.get("adults") || 1);
 
       const cities = await fetchCities();
-      const depCity = cities.find(
-        (c) => (c.iataCode || "").toUpperCase() === originCityCode
-      );
-      const destCity = cities.find(
-        (c) => (c.iataCode || "").toUpperCase() === destinationCityCode
-      );
+      const byIata = (code) =>
+        cities.find(
+          (c) => (c.iataCode || "").toUpperCase() === (code || "").toUpperCase()
+        );
 
-      if (!depCity || !destCity) {
+      const originCity = byIata(originParam);
+      const destCity = byIata(destParam);
+
+      if (!originCity || !destCity) {
         throw new Error(
-          "Could not match your city codes to City records. " +
-            "Use city IATA codes (e.g., LON not LHR; PAR not CDG) and backfill City.iataCode."
+          "Couldn’t map origin/destination to Cities. Check your City seeds and iata_code values (use city codes like LON/PAR, not LHR/CDG)."
         );
       }
 
-      const durationHours =
-        offer.outDurationHours ??
-        (offer.outDurationMinutes
-          ? Math.round((offer.outDurationMinutes / 60) * 100) / 100
-          : 0);
+      const outMins =
+        offer.outDurationMinutes ??
+        computeMinutesBetween(offer.outDepartureAt, offer.outArrivalAt);
+      const durationHoursStr = minutesToHoursStr(outMins || 0);
 
       const result = await createFlightBooking(
         offer.outArrivalAt,
-        offer.outDepartureIata,
-        depCity.id,
-        offer.outDepartureAt,
-        offer.outArrivalIata,
-        destCity.id,
-        String(durationHours),
-        passengers,
-        offer.outStops ?? 0,
-        String(offer.priceTotal)
+        offer.outDepartureIata, // departureAirport (IATA)
+        originCity.id, // departureCityId
+        offer.outDepartureAt, // departureDateTime
+        offer.outArrivalIata, // destinationAirport (IATA)
+        destCity.id, // destinationCityId
+        durationHoursStr, // flightDuration (Decimal as string)
+        adultsParam, // numberOfPassengers
+        offer.outStops ?? 0, // numberOfStops
+        String(offer.priceTotal ?? "0") // totalPrice (Decimal as string)
       );
 
       if (!result?.success) {
-        throw new Error(result?.errors?.join(", ") || "Create booking failed");
+        throw new Error(result?.errors?.join(", ") || "Booking failed");
       }
 
       alert("Flight booked!");
-    } catch (e) {
-      console.error("Booking error:", e);
-      console.error("Network error body:", e?.networkError?.result);
-      alert(e.message || "Failed to book flight");
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Failed to book flight");
     } finally {
-      setBookingBusy(false);
+      setBookingBusyId(null);
     }
-  };
+  }
 
-  const handleRetry = () => {
+  const handleRetry = () => setLastKey(null);
+
+  function onSubmit(e) {
+    e.preventDefault();
+    if (!origin || !destination || !departureDate) return;
+
+    const q = new URLSearchParams({
+      origin: origin.trim().toUpperCase(),
+      destination: destination.trim().toUpperCase(),
+      departureDate,
+      adults: String(Math.max(1, adults)),
+      nonStop: "true",
+    });
+    if (returnDate) q.set("returnDate", returnDate);
+
+    navigate(`/results?${q.toString()}`);
+    setShowSearch(false);
     setLastKey(null);
-  };
+  }
 
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">Flight results</h2>
-        <Link to="/flights/search" className="btn btn-ghost btn-sm">
-          Change search
-        </Link>
+        <button className="btn btn-ghost btn-sm" onClick={toggleSearch}>
+          {showSearch ? "Close" : "Change search"}
+        </button>
       </div>
+
+      {showSearch && (
+        <form
+          onSubmit={onSubmit}
+          className="space-y-3 p-4 rounded-box bg-base-100 shadow"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">Route</legend>
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  className="input"
+                  placeholder="Origin (IATA)"
+                  value={origin}
+                  onChange={(e) => setOrigin(e.target.value.toUpperCase())}
+                  maxLength={3}
+                />
+                <input
+                  className="input"
+                  placeholder="Destination (IATA)"
+                  value={destination}
+                  onChange={(e) => setDestination(e.target.value.toUpperCase())}
+                  maxLength={3}
+                />
+              </div>
+            </fieldset>
+
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">Dates</legend>
+              <div className="grid grid-cols-2 gap-3">
+                <input
+                  type="date"
+                  className="input"
+                  value={departureDate}
+                  onChange={(e) => setDepartureDate(e.target.value)}
+                  required
+                />
+                <input
+                  type="date"
+                  className="input"
+                  value={returnDate}
+                  onChange={(e) => setReturnDate(e.target.value)}
+                />
+              </div>
+            </fieldset>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">Passengers</legend>
+              <input
+                type="number"
+                className="input"
+                min={1}
+                max={9}
+                value={adults}
+                onChange={(e) => setAdults(Number(e.target.value || 1))}
+              />
+            </fieldset>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button className="btn btn-primary btn-sm" type="submit">
+              Apply
+            </button>
+            <button
+              type="button"
+              className="btn btn-ghost btn-sm"
+              onClick={() => setShowSearch(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      )}
 
       {loading && (
         <div className="p-4">
@@ -180,14 +289,6 @@ export default function FlightResults({
             <FlightCard key={o.id} offer={o} onSelect={handleSelect} />
           ))}
         </ul>
-      )}
-
-      {bookingBusy && (
-        <div className="toast toast-end">
-          <div className="alert alert-info">
-            <span>Processing your booking…</span>
-          </div>
-        </div>
       )}
     </section>
   );

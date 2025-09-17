@@ -129,3 +129,100 @@ export function toTicketmasterFilter(uiCategory) {
       return undefined; // All
   }
 }
+
+function seededUnit(str) {
+  let h = 2166136261; // FNV-1a
+  for (let i = 0; i < str.length; i++) {
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return ((h >>> 0) % 10000) / 10000; // 0..0.9999
+}
+
+function guessCurrencyByCountryCode(cc) {
+  if (!cc) return "GBP";
+  switch (cc.toUpperCase()) {
+    case "GB":
+      return "GBP";
+    case "US":
+      return "USD";
+    case "CA":
+      return "CAD";
+    case "AU":
+      return "AUD";
+    case "NZ":
+      return "NZD";
+    case "JP":
+      return "JPY";
+    case "KR":
+      return "KRW";
+    case "SG":
+      return "SGD";
+    case "CH":
+      return "CHF";
+    case "SE":
+      return "SEK";
+    case "NO":
+      return "NOK";
+    case "DK":
+      return "DKK";
+    case "CZ":
+      return "CZK";
+    case "PL":
+      return "PLN";
+    case "HU":
+      return "HUF";
+    case "IL":
+      return "ILS";
+    case "IN":
+      return "INR";
+    case "TH":
+      return "THB";
+    case "VN":
+      return "VND";
+    case "MY":
+      return "MYR";
+    case "ID":
+      return "IDR";
+    case "PH":
+      return "PHP";
+    case "BR":
+      return "BRL";
+    case "MX":
+      return "MXN";
+    case "ZA":
+      return "ZAR";
+    default:
+      return "EUR";
+  }
+}
+
+const ESTIMATE_RANGES = {
+  Music: [30, 120],
+  Sports: [25, 140],
+  Arts: [15, 80],
+  Film: [10, 25],
+  Family: [10, 60],
+};
+
+export function estimatePriceForEvent(uiCategory, countryCode, seedKey) {
+  const [lo, hi] = ESTIMATE_RANGES[uiCategory] || ESTIMATE_RANGES.Family;
+  const t = seededUnit(seedKey || "seed");
+  const amt = Math.round((lo + t * (hi - lo)) * 100) / 100; // 2dp
+  return { amount: amt, currency: guessCurrencyByCountryCode(countryCode) };
+}
+
+export function toEpochMillis(s) {
+  if (!s) return Number.POSITIVE_INFINITY;
+  if (s.includes("T")) {
+    const d = new Date(s);
+    return isNaN(d) ? Number.POSITIVE_INFINITY : d.getTime();
+  }
+  // handle YYYY-MM-DD (treat as start of day UTC)
+  try {
+    const [y, m, d] = s.split("-").map(Number);
+    return Date.UTC(y, (m || 1) - 1, d || 1, 0, 0, 0, 0);
+  } catch {
+    return Number.POSITIVE_INFINITY;
+  }
+}
