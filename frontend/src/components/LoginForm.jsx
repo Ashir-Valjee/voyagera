@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { login } from "../services/auth";
-
 
 export default function LoginForm({ onLogin, onClose }) {
   const [email, setEmail] = useState("");
