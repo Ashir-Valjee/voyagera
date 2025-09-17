@@ -4,9 +4,7 @@ import { fetchActivityBookingByFlight } from '../services/activity_booking';
 import { Pencil, Trash2 } from 'lucide-react';
 
 const FlightBookings = ({ bookings }) => {
-    // 🔹 Track which flight has its activities open
     const [expandedFlightId, setExpandedFlightId] = useState(null);
-    // 🔹 Store fetched activities
     const [activities, setActivities] = useState({});
     const [loadingFlightId, setLoadingFlightId] = useState(null);
 
@@ -16,12 +14,10 @@ const FlightBookings = ({ bookings }) => {
 
     const handleToggleActivities = async (flightId) => {
         if (expandedFlightId === flightId) {
-            // 🔹 Close if already open
             setExpandedFlightId(null);
             return;
         }
 
-        // 🔹 If not fetched yet, load activities for this flight
         if (!activities[flightId]) {
             setLoadingFlightId(flightId);
             try {
@@ -41,7 +37,6 @@ const FlightBookings = ({ bookings }) => {
             }
         }
 
-        // 🔹 Expand this flight card
         setExpandedFlightId(flightId);
     };
 
@@ -49,9 +44,9 @@ const FlightBookings = ({ bookings }) => {
         <div>
             <div className="divider"></div>
             <div className="space-y-2 mt-4">
+                
                 {bookings.map((booking) => (
                     <div key={booking.id} className="card bg-base-200 shadow-md mb-8">
-                        {/* Flight Header */}
                         <div className="card-header px-4 py-2 bg-primary text-primary-content rounded-t">
                             <h4 className="text-lg font-semibold">
                                 {booking.departureCity?.city} to {booking.destinationCity?.city}
@@ -93,7 +88,6 @@ const FlightBookings = ({ bookings }) => {
                             </button>
                         </div>
 
-                        {/* Activities Section (conditionally shown) */}
                         {expandedFlightId === booking.id && (
                             <div className="card bg-base-100 shadow-inner mx-4 mb-4">
                                 <div className="card-body">
