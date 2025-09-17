@@ -15,35 +15,47 @@ export function AuthProvider({ children }) {
     // Function to check if user is already logged in
     const checkAuthStatus = async () => {
         try {
-        const token = localStorage.getItem('access');
-        if (token) {
-            // Token exists, try to get user info
+            const token = localStorage.getItem('access');
+            if (token) {
+                // Token exists, try to get user info
+                const userData = await fetchMe();
+                setUser(userData);
+            }
+        } catch (error) {
+            console.log('No valid session found');
+            // Clear invalid token
+            localStorage.removeItem('access');
+            localStorage.removeItem('refresh');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Add this new method to refresh user after signup
+    const refreshUser = async () => {
+        try {
             const userData = await fetchMe();
             setUser(userData);
-        }
+            return userData;
         } catch (error) {
-        console.log('No valid session found');
-        // Clear invalid token
-        localStorage.removeItem('access');
-        localStorage.removeItem('refresh');
-        } finally {
-        setLoading(false);
+            console.error('Failed to refresh user:', error);
+            return null;
         }
     };
 
     // Enhanced login function
     const handleLogin = async (email, password) => {
         try {
-        // Use the existing auth service
-        const tokens = await authLogin(email, password);
-        
-        // Get user data after successful login
-        const userData = await fetchMe();
-        setUser(userData);
-        
-        return { success: true, user: userData };
+            // Use the existing auth service
+            const tokens = await authLogin(email, password);
+            
+            // Get user data after successful login
+            const userData = await fetchMe();
+            setUser(userData);
+            
+            return { success: true, user: userData };
         } catch (error) {
-        throw error; // Let the component handle the error
+            throw error; // Let the component handle the error
         }
     };
 
@@ -58,7 +70,8 @@ export function AuthProvider({ children }) {
         isAuthenticated: !!user,
         login: handleLogin,
         logout: handleLogout,
-        loading
+        loading,
+        refreshUser  // Add this
     };
 
     return (
@@ -72,9 +85,6 @@ export function useAuth() {
     const context = useContext(AuthContext);
     if (!context) {
         throw new Error('useAuth must be used within AuthProvider');
-
     }
-    return context
+    return context;
 }
-
-
