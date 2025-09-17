@@ -15,6 +15,8 @@ import {
   normalizeCategory,
   toTicketmasterFilter,
   ensureDateTimeZ,
+  estimatePriceForEvent,
+  toEpochMillis,
 } from "../utils/helpers";
 
 export default function Activities() {
@@ -31,6 +33,7 @@ export default function Activities() {
   const destinationParam = (params.get("destination") || "").trim();
   const departureDate = params.get("departureDate") || "";
   const returnDate = params.get("returnDate") || "";
+  const peopleCount = Math.max(1, parseInt(params.get("adults") || "1", 10)); // <— NEW
 
   const { startIso, endIso } = useMemo(() => {
     if (departureDate && returnDate) {
@@ -89,19 +92,45 @@ export default function Activities() {
 
         const results = await fetchTicketmasterEvents({
           city: cityName,
-          countryCode: countryCode,
+          countryCode,
           startDateTime: startIso,
           endDateTime: endIso,
-          classificationName: tmFilter, // "Arts & Theatre" for Arts, etc.
+          classificationName: tmFilter,
           size: 24,
         });
 
-        const normalized = (results || []).map((ev) => ({
-          ...ev,
-          uiCategory: normalizeCategory(ev?.classificationName),
-        }));
+        // Ensure each event has a price (use estimate if TM lacks price)
+        const withPrices = (results || []).map((ev) => {
+          const uiCategory = normalizeCategory(ev?.classificationName);
+          const hasPrice = ev.priceMin != null || ev.priceMax != null;
 
-        if (!cancelled) setEvents(normalized);
+          if (hasPrice) {
+            return { ...ev, uiCategory, isEstimated: false };
+          }
+
+          const est = estimatePriceForEvent(
+            uiCategory || "Family",
+            countryCode,
+            `${ev.id}|${ev.city}`
+          );
+
+          return {
+            ...ev,
+            uiCategory,
+            priceMin: est?.amount ?? null,
+            priceMax: est?.amount ?? null,
+            priceCurrency: est?.currency ?? null,
+            isEstimated: false,
+          };
+        });
+
+        const sorted = withPrices
+          .slice()
+          .sort(
+            (a, b) =>
+              toEpochMillis(a.startDateTime) - toEpochMillis(b.startDateTime)
+          );
+        if (!cancelled) setEvents(sorted);
       } catch (e) {
         if (!cancelled) {
           console.error(e);
@@ -133,7 +162,6 @@ export default function Activities() {
       if (!cityRec)
         throw new Error("Couldn't map event city to a City record.");
 
-      //  pick a flight booking to associate (most recent)
       if (!bookings?.length) {
         throw new Error("No flight booking found. Please book a flight first.");
       }
@@ -144,14 +172,18 @@ export default function Activities() {
 
       const categoryUpper = (ev.uiCategory || "Family").toUpperCase();
 
+      const unitPrice = ev.priceMin ?? ev.priceMax ?? 0;
+      const totalPriceNum = Math.max(0, Number(unitPrice)) * peopleCount;
+      const totalPrice = totalPriceNum.toFixed(2);
+
       const res = await createActivityBooking(
         ensureDateTimeZ(ev.startDateTime),
         cityRec.id,
-        1,
+        peopleCount,
         categoryUpper,
         ev.name,
         ev.eventUrl,
-        "0.00",
+        totalPrice,
         chosen.id,
         ev.imageUrl || ""
       );
@@ -219,6 +251,7 @@ export default function Activities() {
             <ActivityCard
               key={ev.id}
               ev={ev}
+              peopleCount={peopleCount} // <— NEW
               onBook={handleBook}
               busy={busyId === ev.id}
             />

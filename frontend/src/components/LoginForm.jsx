@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { login } from "../services/auth";
 
@@ -8,6 +9,8 @@ export default function LoginForm({ onLogin, onClose }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  const { login } = useAuth(); // Use our AuthContext login function
 
   const navigate = useNavigate();
 
@@ -17,6 +20,11 @@ export default function LoginForm({ onLogin, onClose }) {
     setError(null);
 
     try {
+      // Use the AuthContext login function
+      await login(email, password);
+      
+      // Close the modal on successful login
+      document.getElementById('my_modal_5').close();
       const result = await login(email, password);
       console.log("Login success:", result);
 
