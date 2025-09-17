@@ -104,11 +104,11 @@ export default function FlightSearchPage() {
     );
 
   return (
-      <section className="w-full max-w-5xl bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+      <section className="w-full max-w-5xl bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg">
 
         <form onSubmit={onSubmit} className="mt-8 space-y-2">
           <fieldset className="fieldset">
-            <legend className="fieldset-legend mb-1 text-base font-medium text-gray-900">Route</legend>
+            <legend className="fieldset-legend mb-1 text-base font-medium text-gray-900 dark:text-white">Route</legend>
             <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <div className="relative">
                 <CityAutocomplete 
@@ -131,7 +131,7 @@ export default function FlightSearchPage() {
 
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <span className="text-gray-500">🛬</span>
+                    <span className="text-gray-500 dark:text-white">🛬</span>
                   </div>
                 <CityAutocomplete 
                 id="destination-city" 
@@ -146,15 +146,15 @@ export default function FlightSearchPage() {
               </div>
             </div>
             {loadingCities && (
-              <p className="text-xs text-gray-500 mt-1">Loading cities…</p>
+              <p className="text-xs text-gray-500 dark:text-white mt-1">Loading cities…</p>
             )}
           </fieldset>
 
           <fieldset className="fieldset">
-            <legend className="fieldset-legend mb-1 text-base font-medium text-gray-900">Dates</legend>
+            <legend className="fieldset-legend mb-1 text-base font-medium text-gray-900 dark:text-white">Dates</legend>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col">
-                  <label htmlFor="departure-date" className="mb-1 text-sm font-medium text-gray-700">Departure</label>
+                  <label htmlFor="departure-date" className="mb-1 text-sm font-medium text-gray-700 dark:text-white">Departure</label>
                   <div className="relative">
                     <input 
                     id="departure-date" 
@@ -166,7 +166,7 @@ export default function FlightSearchPage() {
                   </div>
                 </div>
                 <div className="flex flex-col">
-                  <label htmlFor="return-date" className="mb-1 text-sm font-medium text-gray-700">Return</label>
+                  <label htmlFor="return-date" className="mb-1 text-sm font-medium text-gray-700 dark:text-white">Return</label>
                   <div className="relative">
                     <input 
                     id="return-date" 
@@ -180,10 +180,10 @@ export default function FlightSearchPage() {
           </fieldset>
           
           <fieldset className="fieldset">
-            <legend className="fieldset-legend mb-1 text-base font-medium text-gray-900">Passengers</legend>
+            <legend className="fieldset-legend mb-1 text-base font-medium text-gray-900 dark:text-white">Passengers</legend>
             <div className="max-w-xs">
                 <div className="flex flex-col">
-                  <label htmlFor="passengers" className="mb-1 text-sm font-medium text-gray-700">Adults</label>
+                  <label htmlFor="passengers" className="mb-1 text-sm font-medium text-gray-700 dark:text-white">Adults</label>
                   <div className="relative">
                     <input 
                     id="passengers" 

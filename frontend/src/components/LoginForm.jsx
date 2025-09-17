@@ -20,11 +20,8 @@ export default function LoginForm({ onLogin, onClose }) {
       await login(email, password);
       
       // Close the modal on successful login
-      document.getElementById('my_modal_5').close();
-      const result = await login(email, password);
+      document.getElementById('login_modal').close();
       console.log("Login success:", result);
-
-      localStorage.setItem("userName", email);
 
       // Update navbar login state
       if (onLogin) onLogin();
@@ -33,7 +30,7 @@ export default function LoginForm({ onLogin, onClose }) {
       setPassword("");
 
       // Close modal
-      const modal = document.getElementById("my_modal_5");
+      const modal = document.getElementById("login_modal");
       if (modal) modal.close();
 
       if (onClose) onClose();
