@@ -1,11 +1,14 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useState } from "react";
 import LoginForm from './LoginForm';
 import { useAuth } from '../contexts/AuthContext';
 import PlaceholderImage from "../assets/Portrait_Placeholder.png";
+import TopDestinations from "./TopDestinations"; // ⬅️ import modal
 
 const NavBar = () => {
     const { user, isAuthenticated, logout, loading } = useAuth();
     const navigate = useNavigate();
+    const [isTopDestinationsOpen, setIsTopDestinationsOpen] = useState(false); // ⬅️ modal state
 
     const handleLogout = () => {
         logout();
@@ -40,7 +43,6 @@ const NavBar = () => {
 
         return (
             <>
-                {/* Remove the welcome message from here - no longer in mobile menu */}
                 <li>
                     <Link to="/profile" className="flex items-center gap-2">
                         <div className="avatar">
@@ -79,12 +81,25 @@ const NavBar = () => {
 
     return (
         <div className="navbar bg-base-100 shadow-lg sticky top-0 z-50">
-            <div className="navbar-start">
+            <div className="navbar-start flex items-center gap-3">
                 <Link to="/" className="btn btn-ghost text-xl">Voyagera</Link>
+
+                {/* ✈️ Top Destinations dropdown trigger */}
+                <div className="relative">
+                    <button
+                        className="btn btn-ghost text-sm"
+                        onClick={() => setIsTopDestinationsOpen(!isTopDestinationsOpen)}
+                    >
+                        ✈️ Top Destinations
+                    </button>
+                    <TopDestinations
+                        isOpen={isTopDestinationsOpen}
+                        onClose={() => setIsTopDestinationsOpen(false)}
+                    />
+                </div>
             </div>
             
             <div className="navbar-end flex items-center gap-2">
-                {/* Welcome message - always visible when authenticated */}
                 {isAuthenticated && (
                     <span className="text-sm mr-2">
                         Welcome, {user?.email || user?.username}!
