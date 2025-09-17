@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Profile from "../components/Profile";
 import { fetchUserProfile, updateUserProfile, uploadProfilePicture } from "../services/profile";
-import { fetchFlightBookings } from "../services/flights";
+import { fetchFlightBookings, deleteFlightBooking} from "../services/flights";
 import { fetchCities } from "../services/city";
 import { useAuth } from "../contexts/AuthContext";
 import { fetchActivityBookingsByUser } from '../services/activity_booking';
@@ -100,6 +100,19 @@ const ProfilePage = () => {
         }
     };
 
+    const handleDeleteFlight = async (flightId) => {
+        try {
+            await deleteFlightBooking(flightId);
+            setProfile(prev => ({
+                ...prev,
+                flightBookings: prev.flightBookings.filter(f => f.id !== flightId)
+            }));
+        } catch (err) {
+            console.error("Failed to delete flight:", err);
+            setError("Could not delete flight");
+        }
+    };
+
     if (loading) return <p className="text-center p-8">Loading your profile...</p>;
     
     if (error) return (
@@ -116,6 +129,7 @@ const ProfilePage = () => {
                     initialProfile={profile}
                     cities={cities} 
                     onUpdate={handleUpdate} 
+                    onDeleteFlight={handleDeleteFlight}
                 />
             </div>
         </>
