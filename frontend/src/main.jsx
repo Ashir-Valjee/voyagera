@@ -11,6 +11,7 @@ import SignupPage from "./pages/SignupPage.jsx"
 import Results from "./pages/Results.jsx";
 import ProfilePage from "./pages/ProfilePage.jsx"
 import ErrorPage from "./pages/ErrorPage.jsx";
+import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
 const router = createBrowserRouter([
   {
@@ -28,11 +29,19 @@ const router = createBrowserRouter([
       },
       {
         path: "/results",
-        element: <Results />, 
+        element: (
+          <ProtectedRoute>
+            <Results />
+          </ProtectedRoute>
+        ), 
       },
       {
         path: "/profile",
-        element: <ProfilePage />, 
+        element: (
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        ), 
       },
     ]
   },
