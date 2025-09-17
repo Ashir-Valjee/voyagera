@@ -34,21 +34,33 @@ const FlightBookings = ({ bookings, onDelete, onUpdate }) => {
     };
 
     const handleUpdate = async () => {
-    if (!editingBooking) return;
-    try {
+        if (!editingBooking) return;
+        try {
         setLoading(true);
-        const pricePerPassenger = editingBooking.totalPrice / editingBooking.numberOfPassengers;
+
+        const oldTotal = Number(editingBooking.totalPrice);
+        const oldPassengers = Number(editingBooking.numberOfPassengers);
+
+        const pricePerPassenger = oldTotal / oldPassengers;
         const newTotalPrice = pricePerPassenger * editPassengers;
 
-        const updatedBooking = await updateFlightBooking(
-        editingBooking.id,
-        editPassengers,
-        newTotalPrice
+        // call backend
+        const updatedBookingResponse = await updateFlightBooking(
+        editingBooking,
+        editPassengers
         );
 
-        // update parent state properly (not onDelete, since that’s for deleting)
-        if (updatedBooking?.flight_booking && onUpdate) {
-            onUpdate(updatedBooking.flight_booking);
+        const updatedBooking = {
+            ...editingBooking,
+            ...(updatedBookingResponse?.flight_booking || {}),
+            id: editingBooking.id, 
+            numberOfPassengers: editPassengers,
+            totalPrice: newTotalPrice,
+            };
+
+
+        if (onUpdate) {
+        onUpdate(updatedBooking);
         }
     } catch (err) {
         console.error("Failed to update booking:", err);
@@ -56,7 +68,8 @@ const FlightBookings = ({ bookings, onDelete, onUpdate }) => {
         setLoading(false);
         setEditingBooking(null);
     }
-};
+    };
+
     
     if (!bookings || bookings.length === 0) {
         return <p className="text-center text-base-content/60">No flights booked yet.</p>;

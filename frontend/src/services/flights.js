@@ -82,11 +82,11 @@ export async function updateFlightBooking(booking, newNumberOfPassengers) {
     variables: { 
       id: booking.id, 
       numberOfPassengers: newNumberOfPassengers, 
-      totalPrice: newTotalPrice 
+      totalPrice: newTotalPrice.toFixed(2)
     },
   });
 
-  return data?.updateFlightBooking ?? null;
+  return data?.updateFlightBooking?.flightBooking ?? null;
 }
 
 

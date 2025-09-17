@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import PlaceholderImage from "../assets/Portrait_Placeholder.png"
-import FlightBookings from './FlightBookingProfile'
+import PlaceholderImage from "../assets/Portrait_Placeholder.png";
+import FlightBookings from './FlightBookingProfile';
 import ActivityBookings from './ActivityProfile';
 
-const Profile = ({ initialProfile, cities = [], onUpdate, onDeleteFlight }) => {
+    const Profile = ({ initialProfile, cities = [], onUpdate }) => {
     const [profile, setProfile] = useState(initialProfile || {
         id: null,
         firstName: '',
@@ -15,6 +15,8 @@ const Profile = ({ initialProfile, cities = [], onUpdate, onDeleteFlight }) => {
         likesArts: false,
         likesFilm: false,
         likesFamily: false,
+        flightBookings: [],
+        activityBookings: [],
     });
 
     const [activeTab, setActiveTab] = useState("flights");
@@ -44,7 +46,6 @@ const Profile = ({ initialProfile, cities = [], onUpdate, onDeleteFlight }) => {
 
         try {
         const result = await onUpdate?.(updatedProfile);
-
         if (result && result.profile) {
             setProfile(prevProfile => ({
             ...prevProfile,
@@ -53,7 +54,7 @@ const Profile = ({ initialProfile, cities = [], onUpdate, onDeleteFlight }) => {
         }
         } catch (error) {
         console.error('Failed to update profile:', error);
-        setProfile(profile);
+        setProfile(profile); // rollback on error
         }
     };
 
@@ -176,26 +177,29 @@ const Profile = ({ initialProfile, cities = [], onUpdate, onDeleteFlight }) => {
             </div>
             </div>
 
+            {/* Content */}
             <div className="mt-6">
             {activeTab === "flights" && (
                 <FlightBookings
                 bookings={profile.flightBookings}
-                onDelete={onDeleteFlight}   // ✅ delegate deletion
-                onUpdate={(updatedBooking) =>
+                onDelete={(deletedId) =>
+                    setProfile((prev) => ({
+                    ...prev,
+                    flightBookings: prev.flightBookings.filter((b) => b.id !== deletedId),
+                    }))
+                }
+                onUpdate={(updatedBooking) => {
                     setProfile((prev) => ({
                     ...prev,
                     flightBookings: prev.flightBookings.map((b) =>
                         b.id === updatedBooking.id ? updatedBooking : b
                     ),
-                    }))
-                }
+                    }));
+                }}
                 />
             )}
             {activeTab === "activities" && (
-                <>
-                <input type="checkbox" defaultChecked className="toggle" />
-                <ActivityBookings bookings={initialProfile?.activityBookings} />
-                </>
+                <ActivityBookings bookings={profile.activityBookings} />
             )}
             </div>
         </div>
