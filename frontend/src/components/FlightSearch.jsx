@@ -1,4 +1,3 @@
-// src/pages/FlightSearchPage.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchCities } from "../services/cities";
@@ -7,11 +6,9 @@ import CityAutocomplete from "../components/CityAutocomplete";
 export default function FlightSearchPage() {
   const navigate = useNavigate();
 
-  // typed values
   const [originInput, setOriginInput] = useState("");
   const [destinationInput, setDestinationInput] = useState("");
 
-  // resolved IATA codes
   const [originIata, setOriginIata] = useState(null);
   const [destinationIata, setDestinationIata] = useState(null);
 
@@ -19,7 +16,6 @@ export default function FlightSearchPage() {
   const [returnDate, setReturnDate] = useState("");
   const [adults, setAdults] = useState(1);
 
-  // cities data
   const [cities, setCities] = useState([]);
   const [loadingCities, setLoadingCities] = useState(false);
   const [errors, setErrors] = useState({ origin: "", destination: "" });
@@ -29,7 +25,7 @@ export default function FlightSearchPage() {
     (async () => {
       setLoadingCities(true);
       try {
-        const list = await fetchCities(); // { city, country, iataCode, countryCode }
+        const list = await fetchCities();
         if (!cancelled) setCities(Array.isArray(list) ? list : []);
       } catch {
         if (!cancelled) setCities([]);
@@ -42,7 +38,6 @@ export default function FlightSearchPage() {
     };
   }, []);
 
-  // fallback resolution if needed at submit
   const cityIndex = useMemo(() => {
     const byLabel = new Map();
     for (const c of cities) {
@@ -53,11 +48,10 @@ export default function FlightSearchPage() {
 
   function resolveOnSubmit(text) {
     const t = (text || "").trim().toLowerCase();
-    // try exact "City, Country" first
+
     const direct = cityIndex.byLabel.get(t);
     if (direct?.iataCode) return direct.iataCode.toUpperCase();
 
-    // try 3-letter code typed
     if (/^[a-z]{3}$/i.test(t)) {
       const code = t.toUpperCase();
       const exists = cities.some(
