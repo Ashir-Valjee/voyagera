@@ -7,32 +7,41 @@ def map_event(event):
     venue = (event.get("_embedded", {}).get("venues") or [{}])[0] or {}
     city = (venue.get("city") or {}).get("name")
 
-    # Classification (category) information
+   
     classifications = event.get("classifications", [{}])
     classification_name = classifications[0].get("segment", {}).get("name") if classifications else None
     
-    # Date information
+    
     dates = event.get("dates", {})
     start_date_time = dates.get("start", {}).get("dateTime") or dates.get("start", {}).get("localDate")
     
-    # Country information
+    
     country = (venue.get("country") or {}).get("name")
     
-    # Image URL (get the first high-quality image)
+   
     images = event.get("images", [])
     image_url = None
     if images:
-        # Try to get a medium/large image
+        
         for img in images:
             if img.get("width", 0) >= 300:
                 image_url = img.get("url")
                 break
-        # Fallback to first image if no suitable size found
+        
         if not image_url:
             image_url = images[0].get("url")
     
-    # Event URL
+   
     event_url = event.get("url")
+
+    pr = (event.get("priceRanges") or [])
+    price_min = price_max = None
+    price_currency = None
+    if pr:
+        first = pr[0] or {}
+        price_min = first.get("min")
+        price_max = first.get("max")
+        price_currency = (first.get("currency") or "").upper() or None
 
     return {
         "id": event.get("id"),
@@ -42,7 +51,10 @@ def map_event(event):
         "start_date_time": start_date_time,
         "country": country,
         "image_url": image_url,
-        "event_url": event_url
+        "event_url": event_url,
+        "price_min": price_min,
+        "price_max": price_max,
+        "price_currency": price_currency,
     }
 
 class TicketMasterQueries(graphene.ObjectType):

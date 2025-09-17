@@ -151,6 +151,9 @@ export const TICKETMASTER_EVENTS = gql`
       country
       imageUrl
       eventUrl
+      priceMin
+      priceMax
+      priceCurrency
     }
   }
 `;
