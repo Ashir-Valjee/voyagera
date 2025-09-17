@@ -69,12 +69,12 @@ import ActivityBookings from './ActivityProfile';
     return (
         <div className="card bg-base-100 shadow-xl max-w-2xl mx-auto">
         <div className="card-body">
-            <div className="mb-6">
-            <h2 className="card-title text-2xl">Profile</h2>
-            </div>
 
-            {/* Profile Picture */}
+            {/* Profile Picture and Name */}
             <div className="flex flex-col items-center space-y-4">
+            <h2 className="card-title text-2xl">{profile.firstName} {profile.lastName}</h2>
+
+        
             <div className="relative">
                 <div className="avatar">
                 <div className="w-32 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
@@ -112,6 +112,29 @@ import ActivityBookings from './ActivityProfile';
                 onChange={handleFileChange}
                 className="hidden"
             />
+            </div>
+
+            {/* User name*/}
+            <div className='form-control'>
+                <label className='label justify-center font-semibold'>
+                    <span className='label-text font-semibold'> 👤 Name </span>
+                </label>
+                <div  className='flex gap-4'>
+                    <input
+                    type='text'
+                    placeholder='First Name'
+                    value={profile.firstName || ""}
+                    onChange={(e) => handleAutoSave("firstName", e.target.value)}
+                    className="input input-bordered w-1/2"
+                    />
+                    <input
+                    type='text'
+                    placeholder='Surname'
+                    value={profile.lastName|| ""}
+                    onChange={(e) => handleAutoSave("lastName", e.target.value)}
+                    className="input input-bordered w-1/2"
+                    />
+                </div>
             </div>
 
             {/* Home City */}
