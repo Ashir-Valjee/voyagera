@@ -2,7 +2,6 @@ import HeroBackground from "../assets/landscapes.jpg"
 import './HeroSection.css';
 import FlightSearch from "../components/FlightSearch";
 
-
 const HeroSection = () => {
     return (
         <div className="hero min-h-[70vh] relative">
