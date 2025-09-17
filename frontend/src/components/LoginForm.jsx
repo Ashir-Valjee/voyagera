@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { useNavigate } from "react-router-dom";
-import { login } from "../services/auth";
 
 
 export default function LoginForm({ onLogin, onClose }) {
@@ -11,8 +9,6 @@ export default function LoginForm({ onLogin, onClose }) {
   const [error, setError] = useState(null);
   
   const { login } = useAuth(); // Use our AuthContext login function
-
-  const navigate = useNavigate();
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -42,8 +38,6 @@ export default function LoginForm({ onLogin, onClose }) {
 
       if (onClose) onClose();
 
-      // Navigate to homepage
-      navigate("/");
     } catch (err) {
       console.error("Login error:", err);
       setError(err.message || "Login failed");
