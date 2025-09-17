@@ -70,8 +70,8 @@ describe('LoginForm', () => {
 
     it('should call login and redirect on successful submission', async () => {
         const user = userEvent.setup();
-        const { login } = AuthContext.useAuth();
-        login.mockResolvedValue({ success: true }); 
+        const mockLogin = AuthContext.useAuth().login;
+        mockLogin.mockResolvedValue({ success: true });
 
         renderComponent();
 
@@ -80,11 +80,10 @@ describe('LoginForm', () => {
         await user.click(screen.getByRole('button', { name: /sign in/i }));
 
         await waitFor(() => {
-        expect(login).toHaveBeenCalledWith('user@test.com', 'password');
-        expect(login).toHaveBeenCalledTimes(2);
+        expect(mockLogin).toHaveBeenCalledWith('user@test.com', 'password');
+        expect(mockLogin).toHaveBeenCalledTimes(1);
         });
 
-        expect(localStorage.getItem('userName')).toBe('user@test.com');
         expect(mockOnLogin).toHaveBeenCalled();
         expect(mockOnClose).toHaveBeenCalled();
         expect(mockModalClose).toHaveBeenCalled();

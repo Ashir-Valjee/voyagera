@@ -19,7 +19,7 @@ export default function LoginForm({ onLogin, onClose }) {
 
     try {
       // Use the AuthContext login function
-      await login(email, password);
+      const result = await login(email, password);
       
       // Close the modal on successful login
       document.getElementById('login_modal').close();
