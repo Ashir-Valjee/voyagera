@@ -39,7 +39,10 @@ export default function Pagination({
         >
           Prev
         </button>
-        <span className="join-item px-3 text-sm">
+        <span
+          className="join-item btn btn-ghost btn-sm no-animation normal-case pointer-events-none select-none"
+          aria-live="polite"
+        >
           Page {page} / {pageCount}
         </span>
         <button
