@@ -87,32 +87,38 @@ export default function FlightSearchPage() {
   }
 
   return (
-    <section className="max-w-2xl space-y-4 bg-base-100">
-      <form onSubmit={onSubmit} className="space-y-4">
+    <section className="max-w-2xl space-y-6 bg-base-100 p-5">
+      <form onSubmit={onSubmit} className="space-y-6">
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Route</legend>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <CityAutocomplete
-              id="origin-city"
-              label="Origin"
-              value={originInput}
-              onChange={setOriginInput}
-              cities={cities}
-              onResolved={(code) => setOriginIata(code)}
-              error={errors.origin}
-              required
-            />
-            <CityAutocomplete
-              id="destination-city"
-              label="Destination"
-              value={destinationInput}
-              onChange={setDestinationInput}
-              cities={cities}
-              onResolved={(code) => setDestinationIata(code)}
-              error={errors.destination}
-              required
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              {/* CityAutocomplete renders its own label */}
+              <CityAutocomplete
+                id="origin-city"
+                label="Origin"
+                value={originInput}
+                onChange={setOriginInput}
+                cities={cities}
+                onResolved={(code) => setOriginIata(code)}
+                error={errors.origin}
+                required
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <CityAutocomplete
+                id="destination-city"
+                label="Destination"
+                value={destinationInput}
+                onChange={setDestinationInput}
+                cities={cities}
+                onResolved={(code) => setDestinationIata(code)}
+                error={errors.destination}
+                required
+              />
+            </div>
           </div>
 
           {loadingCities && (
@@ -122,38 +128,62 @@ export default function FlightSearchPage() {
 
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Dates</legend>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <input
-              type="date"
-              className="input w-full"
-              value={departureDate}
-              onChange={(e) => setDepartureDate(e.target.value)}
-              required
-            />
-            <input
-              type="date"
-              className="input w-full"
-              value={returnDate}
-              onChange={(e) => setReturnDate(e.target.value)}
-              placeholder="(optional)"
-            />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1">
+              <label className="label" htmlFor="departure-date">
+                <span className="label-text">Departure date</span>
+              </label>
+              <input
+                id="departure-date"
+                type="date"
+                className="input w-full"
+                value={departureDate}
+                onChange={(e) => setDepartureDate(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="label" htmlFor="return-date">
+                <span className="label-text">Return date (optional)</span>
+              </label>
+              <input
+                id="return-date"
+                type="date"
+                className="input w-full"
+                value={returnDate}
+                onChange={(e) => setReturnDate(e.target.value)}
+              />
+            </div>
           </div>
         </fieldset>
 
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Passengers</legend>
-          <input
-            type="number"
-            className="input w-full md:w-40"
-            min={1}
-            max={9}
-            value={adults}
-            onChange={(e) => setAdults(Number(e.target.value || 1))}
-            required
-          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="flex flex-col gap-1 md:max-w-xs">
+              <label className="label" htmlFor="passengers">
+                <span className="label-text">Adults</span>
+              </label>
+              <input
+                id="passengers"
+                type="number"
+                className="input w-full"
+                min={1}
+                max={9}
+                value={adults}
+                onChange={(e) => setAdults(Number(e.target.value || 1))}
+                required
+              />
+            </div>
+          </div>
         </fieldset>
 
-        <button className="btn btn-primary">Search</button>
+        <div className="flex justify-start">
+          <button className="btn btn-primary">Search</button>
+        </div>
       </form>
     </section>
   );

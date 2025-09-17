@@ -203,10 +203,6 @@ export default function CityAutocomplete({
       </div>
 
       {hasError && <p className="text-error text-xs mt-1">{error}</p>}
-
-      <p className="text-xs opacity-70 mt-2">
-        Choose a city from the list—its IATA code is applied automatically.
-      </p>
     </div>
   );
 }
