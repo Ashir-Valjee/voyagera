@@ -40,11 +40,11 @@ def search_ticketmaster_events(
     data=response.json()
     return data.get("_embedded", {}).get("events", [])
 
-print(search_ticketmaster_events(
-    # city = "London",
-    startDateTime = "2025-09-16T09:59:00Z",
-    endDateTime = "2025-09-18T09:59:00Z",
-    classificationName = "Family",
-    countryCode = "US",
-    size = 1
-))
+# print(search_ticketmaster_events(
+#     # city = "London",
+#     startDateTime = "2025-09-16T09:59:00Z",
+#     endDateTime = "2025-09-18T09:59:00Z",
+#     classificationName = "Family",
+#     countryCode = "US",
+#     size = 1
+# ))

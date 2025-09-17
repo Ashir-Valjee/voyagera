@@ -6,7 +6,7 @@ from ...models.activity_booking import ActivityBooking
 from ..utils.auth import require_user
 
 class ActivityBookingQueries(graphene.ObjectType):
-    activity_booking_by_flight_id = graphene.List(
+    activityBookingsByFlightId = graphene.List(
         ActivityBookingType,
         flight_booking_id = graphene.Int(required=True)
     )
@@ -21,7 +21,7 @@ class ActivityBookingQueries(graphene.ObjectType):
     )
 
 
-    def resolve_activity_booking_by_flight_id(self,info, flight_booking_id):
+    def resolve_activityBookingsByFlightId(self,info, flight_booking_id):
         user = require_user(info)
         my_activities =  ActivityBooking.objects.filter(flight_booking_id=flight_booking_id, flight_booking__user=user)
         if not my_activities:

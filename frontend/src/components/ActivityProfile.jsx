@@ -1,71 +1,72 @@
+import { Pencil, Trash2, Users } from "lucide-react";
+import { prettyWhen } from "../utils/helpers"
 
 const ActivityBookings = ({ bookings }) => {
     if (!bookings || bookings.length === 0) {
-        return <p className="text-center text-base-content/60"> No activities booked yet.</p>
+        return <p className="text-center text-base-content/60">No activities booked yet.</p>;
     }
 
-    // return(
-    //     <div>
-    //         <div className="divider"></div>
-    //         <h3 className="text-xl font-semibold text-center mt-4"></h3>
-
-    //         <div>
-    //             {bookings.map((booking) => (
-    //                 <div key={booking.id} className="card bg-base-200 shadow-md mb-8">
-    //                     <div>
-    //                         <h4 className="text-lg font-semibold">
-    //                             {booking.activityName}
-    //                         </h4>
-    //                     </div>
-    //                     <figure className="aspect-[16/9]">
-    //                         <img src={booking.imageUrl} alt={booking.activityName} className="w-full h-full object-cover"/>
-    //                     </figure>
-
-    //                 </div>
-
-    //             ))}
-
-    //         </div>
-    //     </div>
-    // )
     return (
-    <div className="space-y-6 mt-4">
-      {bookings.map((booking) => (
-        <div key={booking.id} className="card bg-base-100 shadow-md overflow-hidden">
-          {/* Image at the top */}
-          {booking.imageUrl && (
-            <figure className="aspect-[16/9]">
-              <img
-                src={booking.imageUrl}
-                alt={booking.activityName}
-                className="w-full h-full object-cover"
-              />
-            </figure>
-          )}
+        <div className="space-y-4 mt-4"> {/* Stack cards vertically */}
+            {bookings.map((booking) => (
+                <div
+                    key={booking.id}
+                    className="card bg-base-100 shadow-md overflow-hidden"
+                >
+                    {/* Image at the top */}
+                    {booking.imageUrl && (
+                        <figure className="aspect-[16/9]">
+                            <img
+                                src={booking.imageUrl}
+                                alt={booking.activityName}
+                                className="w-full h-full object-cover"
+                            />
+                        </figure>
+                    )}
 
-          {/* Card body with details */}
-          <div className="card-body">
-            <h4 className="card-title text-lg font-semibold">{booking.activityName}</h4>
+                    {/* Card body with details */}
+                    <div className="card-body">
+                        {/* Title and Category Badge */}
+                        <div className="flex items-start justify-between gap-2">
+                            <h3 className="card-title text-xl leading-tight">{booking.activityName}</h3>
+                            <span className="badge badge-outline shrink-0">{booking.category}</span>
+                        </div>
 
-            {/* Category badge */}
-            {booking.category && (
-              <span className="badge badge-outline mb-2">{booking.category}</span>
-            )}
+                        {/* Details */}
+                        <div className="text-sm text-base-content/80 mb-2 space-y-1">
+                            <p>{prettyWhen(booking.activityDateTime)}</p>
+                            <p>{booking.flightBooking?.destinationCity?.city}</p>
+                            <p className="flex items-center gap-1">
+                                <Users className="w-4 h-4" /> {booking.numberOfPeople}
+                            </p>
+                            <p>£{booking.totalPrice}</p>
+                        </div>
 
-            {/* Details grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-base-content/80">
-              <p><strong>Date & Time:</strong> {new Date(booking.activityDateTime).toLocaleString()}</p>
-              <p><strong>Location:</strong> {booking.flightBooking?.destinationCity?.city}</p>
-              <p><strong>People:</strong> {booking.numberOfPeople}</p>
-              <p><strong>Total Price:</strong> £{booking.totalPrice}</p>
-            </div>
-
-    
-          </div>
+                        {/* Actions */}
+                        <div className="card-actions justify-end gap-2">
+                            <button className="btn btn-primary btn-sm">
+                                <Pencil className="w-4 h-4" />
+                            </button>
+                            <button className="btn btn-outline btn-sm">
+                                <Trash2 className="w-4 h-4" />
+                            </button>
+                            <a
+                                href={booking.activityUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="btn btn-sm"
+                            >
+                                Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            ))}
         </div>
-      ))}
-    </div>
-  );
-}
+    );
+};
 
-export default ActivityBookings
+export default ActivityBookings;
+
+
+
