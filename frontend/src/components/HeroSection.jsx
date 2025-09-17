@@ -1,4 +1,4 @@
-import HeroBackground from "../assets/landscape.jpg"
+import HeroBackground from "../assets/landscapes.jpg"
 import './HeroSection.css';
 import FlightSearch from "../components/FlightSearch";
 

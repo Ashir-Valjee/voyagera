@@ -104,12 +104,12 @@ export default function FlightSearchPage() {
     );
 
   return (
-      <section className="w-full max-w-5xl bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg">
+      <section className="w-full max-w-5xl bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-xl">
 
         <form onSubmit={onSubmit} className="mt-8 space-y-2">
-          <fieldset className="fieldset">
-            <legend className="fieldset-legend mb-1 text-base font-medium text-gray-900 dark:text-white">Route</legend>
-            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+          <fieldset className="fieldset p-0">
+            <legend className="fieldset-legend mb-0 text-base font-medium text-gray-900 dark:text-white">Route</legend>
+            <div className="relative grid grid-cols-1 md:grid-cols-2 gap-0 md:gap-18 items-center">
               <div className="relative">
                 <CityAutocomplete 
                 id="origin-city" 
@@ -123,7 +123,7 @@ export default function FlightSearchPage() {
                 inputClassName="pl-10" />
               </div>
 
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:block">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/4 hidden md:block">
                   <button  className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-600 transition-colors">
                       <SwapIcon className="w-5 h-5" />
                   </button>
@@ -150,7 +150,7 @@ export default function FlightSearchPage() {
             )}
           </fieldset>
 
-          <fieldset className="fieldset">
+          <fieldset className="fieldset p-0">
             <legend className="fieldset-legend mb-1 text-base font-medium text-gray-900 dark:text-white">Dates</legend>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col">
@@ -179,7 +179,8 @@ export default function FlightSearchPage() {
             </div>
           </fieldset>
           
-          <fieldset className="fieldset">
+          
+          <fieldset className="fieldset p-0">
             <legend className="fieldset-legend mb-1 text-base font-medium text-gray-900 dark:text-white">Passengers</legend>
             <div className="max-w-xs">
                 <div className="flex flex-col">
