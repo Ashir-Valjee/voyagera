@@ -38,8 +38,7 @@ export default function LoginForm({ onLogin, onClose }) {
 
       if (onClose) onClose();
 
-      // Navigate to homepage
-      navigate("/");
+      navigate("/profile");
     } catch (err) {
       console.error("Login error:", err);
       setError(err.message || "Login failed");

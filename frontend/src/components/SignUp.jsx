@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signup } from "../services/auth";
-import { useAuth } from "../contexts/AuthContext"; // Add this
+import { useAuth } from "../contexts/AuthContext"; 
 import BackgroundImage from "../assets/signup_background.jpg";
 import './SignUp.css';
 
@@ -12,7 +11,7 @@ export default function SignupForm() {
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
-  const { refreshUser } = useAuth(); // Add this
+  const { signup } = useAuth();
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -20,26 +19,13 @@ export default function SignupForm() {
     setError(null);
 
     try {
-      // 1. Signup
-      const { access, refresh } = await signup(email, password);
-      console.log("Signup success:", { access, refresh });
-
-      // 2. Save user email (tokens already saved by signup service)
-      localStorage.setItem("userName", email);
-      window.dispatchEvent(new Event("storage"));
-
-      // 3. Refresh the user in AuthContext
-      await refreshUser();
-
-      // 4. Redirect to the home page
-      navigate("/");
+      await signup(email, password);
+      navigate("/profile");
     } catch (err) {
       console.error("Signup error:", err);
       setError(err.message || "Sign up failed");
     } finally {
       setLoading(false);
-      setEmail("");
-      setPassword("");
     }
   }
 

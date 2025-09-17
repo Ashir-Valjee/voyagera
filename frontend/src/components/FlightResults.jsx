@@ -259,7 +259,7 @@ export default function FlightResults({
 
       {loading && (
         <div className="p-4">
-          <span className="loading loading-spinner loading-md" />
+          <span className="loading loading-spinner text-primary loading-md" />
         </div>
       )}
 

@@ -1,12 +1,15 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from "react";
-import { login as authLogin, logout as authLogout } from "../services/auth";
-import fetchMe from "../services/user";
+import { useNavigate } from "react-router-dom";
+import { login as authLogin, logout as authLogout, signup } from "../services/auth";
+import { fetchUserProfile } from "../services/profile"
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         checkAuthStatus();
@@ -18,7 +21,7 @@ export function AuthProvider({ children }) {
             const token = localStorage.getItem('access');
             if (token) {
                 // Token exists, try to get user info
-                const userData = await fetchMe();
+                const userData = await fetchUserProfile();
                 setUser(userData);
             }
         } catch (error) {
@@ -34,7 +37,7 @@ export function AuthProvider({ children }) {
     // Add this new method to refresh user after signup
     const refreshUser = async () => {
         try {
-            const userData = await fetchMe();
+            const userData = await fetchUserProfile();
             setUser(userData);
             return userData;
         } catch (error) {
@@ -50,7 +53,7 @@ export function AuthProvider({ children }) {
         await authLogin(email, password);
         
         // Get user data with the new token
-        const userData = await fetchMe();
+        const userData = await fetchUserProfile();
 
         // Update state
         setUser(userData);
@@ -70,13 +73,36 @@ export function AuthProvider({ children }) {
         setUser(null); // Clear user from state
     };
 
+    const signupAction = async (credentials) => {
+        try {
+            await signup(credentials.email, credentials.password);
+            
+            await refreshUser();
+
+            navigate("/profile");
+        } catch (err)
+        {
+            console.error(err);
+            throw err; 
+        }
+    };
+
+    const updateUser = (newUserData) => {
+        setUser(currentUser => {
+            if (!currentUser) return null;
+            return { ...currentUser, ...newUserData };
+        });
+    };
+
     const value = {
         user,
         isAuthenticated: !!user,
         login: handleLogin,
         logout: handleLogout,
         loading,
-        refreshUser  // Add this
+        refreshUser,
+        signupAction,
+        updateUser
     };
 
     return (

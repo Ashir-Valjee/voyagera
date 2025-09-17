@@ -4,12 +4,12 @@ import { useAuth } from '../contexts/AuthContext';
 import PlaceholderImage from "../assets/Portrait_Placeholder.png";
 
 const NavBar = () => {
-    const { user, isAuthenticated, logout, loading } = useAuth();
+    const { user, isAuthenticated, logout, loading, refetchUser } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        navigate("/");
         logout();
+        navigate("/");
     };
 
     // Menu items component for reuse in mobile and desktop
@@ -87,7 +87,7 @@ const NavBar = () => {
                 {/* Welcome message - always visible when authenticated */}
                 {isAuthenticated && (
                     <span className="text-sm mr-2">
-                        Welcome, {user?.email || user?.username}!
+                        Welcome, {user?.firstName || user?.user?.email}!
                     </span>
                 )}
 
@@ -140,7 +140,12 @@ const NavBar = () => {
             {/* Login Modal */}
             <dialog id="login_modal" className="modal modal-bottom sm:modal-middle">
                 <div className="modal-box">
-                    <LoginForm />
+                    <LoginForm
+                        onLogin={() => {
+                            refetchUser();
+                            document.getElementById("login_modal")?.close();
+                        }}
+                    />
                     <div className="modal-action">
                         <form method="dialog">
                             <button className="btn">Close</button>
