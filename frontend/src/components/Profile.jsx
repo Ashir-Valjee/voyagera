@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import PlaceholderImage from "../assets/Portrait_Placeholder.png";
 import FlightBookings from './FlightBookingProfile';
 import ActivityBookings from './ActivityProfile';
+import { Pencil } from "lucide-react";
 
     const Profile = ({ initialProfile, cities = [], onUpdate }) => {
     const [profile, setProfile] = useState(initialProfile || {
@@ -18,6 +19,10 @@ import ActivityBookings from './ActivityProfile';
         flightBookings: [],
         activityBookings: [],
     });
+    const [isEditingName, setIsEditingName] = useState(false); 
+    const [tempFirstName, setTempFirstName] = useState(profile.firstName || ""); 
+    const [tempLastName, setTempLastName] = useState(profile.lastName || "");   
+
 
     const [activeTab, setActiveTab] = useState("flights");
 
@@ -55,6 +60,30 @@ import ActivityBookings from './ActivityProfile';
         } catch (error) {
         console.error('Failed to update profile:', error);
         setProfile(profile); // rollback on error
+        }
+    };
+
+    const handleSaveName = async () => {
+        const updatedProfile = {
+            ...profile,
+            firstName: tempFirstName,
+            lastName: tempLastName,
+        };
+        setProfile(updatedProfile);
+
+        try {
+            const result = await onUpdate?.(updatedProfile);
+            if (result && result.profile) {
+                setProfile(prevProfile => ({
+                    ...prevProfile,
+                    ...result.profile
+                }));
+            }
+        } catch (error) {
+            console.error("Failed to update profile:", error);
+            setProfile(profile);
+        } finally {
+            setIsEditingName(false);
         }
     };
 
@@ -123,17 +152,23 @@ import ActivityBookings from './ActivityProfile';
                     <input
                     type='text'
                     placeholder='First Name'
-                    value={profile.firstName || ""}
-                    onChange={(e) => handleAutoSave("firstName", e.target.value)}
+                    value={tempFirstName}
+                    onChange={(e) =>  setTempFirstName(e.target.value)}
                     className="input input-bordered w-1/2"
                     />
                     <input
                     type='text'
                     placeholder='Surname'
-                    value={profile.lastName|| ""}
-                    onChange={(e) => handleAutoSave("lastName", e.target.value)}
+                    value={tempLastName}
+                    onChange={(e) => setTempLastName(e.target.value)}
                     className="input input-bordered w-1/2"
                     />
+                    <button
+                        className="btn btn-primary btn-sm"
+                        onClick={handleSaveName}
+                    >
+                        Save
+                    </button>
                 </div>
             </div>
 
