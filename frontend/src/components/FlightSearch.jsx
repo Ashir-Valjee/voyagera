@@ -1,23 +1,25 @@
+// src/pages/FlightSearchPage.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchCities } from "../services/cities";
+import CityAutocomplete from "../components/CityAutocomplete";
 
 export default function FlightSearchPage() {
   const navigate = useNavigate();
 
-  // typed inputs (can be IATA or full city, e.g. "London" or "London, United Kingdom")
+  // typed values
   const [originInput, setOriginInput] = useState("");
   const [destinationInput, setDestinationInput] = useState("");
 
-  // resolved IATA codes (derived as user types/chooses a suggestion)
-  const [originIata, setOriginIata] = useState("");
-  const [destinationIata, setDestinationIata] = useState("");
+  // resolved IATA codes
+  const [originIata, setOriginIata] = useState(null);
+  const [destinationIata, setDestinationIata] = useState(null);
 
   const [departureDate, setDepartureDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
   const [adults, setAdults] = useState(1);
 
-  // data + UI state
+  // cities data
   const [cities, setCities] = useState([]);
   const [loadingCities, setLoadingCities] = useState(false);
   const [errors, setErrors] = useState({ origin: "", destination: "" });
@@ -27,10 +29,9 @@ export default function FlightSearchPage() {
     (async () => {
       setLoadingCities(true);
       try {
-        const list = await fetchCities(); // must return {city, country, iataCode, countryCode}
+        const list = await fetchCities(); // { city, country, iataCode, countryCode }
         if (!cancelled) setCities(Array.isArray(list) ? list : []);
-      } catch (e) {
-        console.error(e);
+      } catch {
         if (!cancelled) setCities([]);
       } finally {
         if (!cancelled) setLoadingCities(false);
@@ -41,81 +42,43 @@ export default function FlightSearchPage() {
     };
   }, []);
 
-  const cityOptions = useMemo(() => {
-    // labels used in the <datalist> suggestions
-    return cities
-      .map((c) => ({
-        ...c,
-        label: `${c.city}, ${c.country}${c.iataCode ? ` (${c.iataCode})` : ""}`,
-      }))
-      .sort((a, b) => a.city.localeCompare(b.city));
+  // fallback resolution if needed at submit
+  const cityIndex = useMemo(() => {
+    const byLabel = new Map();
+    for (const c of cities) {
+      byLabel.set(`${c.city}, ${c.country}`.toLowerCase(), c);
+    }
+    return { byLabel };
   }, [cities]);
 
-  function norm(s) {
-    return (s || "").trim().toLowerCase();
-  }
+  function resolveOnSubmit(text) {
+    const t = (text || "").trim().toLowerCase();
+    // try exact "City, Country" first
+    const direct = cityIndex.byLabel.get(t);
+    if (direct?.iataCode) return direct.iataCode.toUpperCase();
 
-  function looksLikeIata(s) {
-    return /^[A-Za-z]{3}$/.test((s || "").trim());
-  }
-
-  function resolveToIata(input) {
-    const raw = (input || "").trim();
-
-    // If user typed an IATA already, validate it exists in our table
-    if (looksLikeIata(raw)) {
-      const code = raw.toUpperCase();
+    // try 3-letter code typed
+    if (/^[a-z]{3}$/i.test(t)) {
+      const code = t.toUpperCase();
       const exists = cities.some(
         (c) => (c.iataCode || "").toUpperCase() === code
       );
       return exists ? code : null;
     }
-
-    // Parse forms like "City", "City, Country"
-    const m = raw.match(/^([^,()]+?)(?:\s*,\s*([^()]+))?$/);
-    const cityPart = norm(m?.[1] || raw);
-    const countryPart = norm(m?.[2] || "");
-
-    let matches = cities.filter((c) => norm(c.city) === cityPart);
-    if (countryPart) {
-      matches = matches.filter((c) => norm(c.country) === countryPart);
-    }
-
-    // prefer a match that actually has an iataCode
-    const withCode = matches.find((c) => !!c.iataCode);
-    if (withCode) return withCode.iataCode.toUpperCase();
-
-    // if multiple without iata, we consider it invalid (we need real IATA for search)
     return null;
-  }
-
-  // live-resolve to IATA as the user types / chooses
-  function onOriginChange(v) {
-    setOriginInput(v);
-    setErrors((e) => ({ ...e, origin: "" }));
-    const code = resolveToIata(v);
-    setOriginIata(code || "");
-  }
-  function onDestinationChange(v) {
-    setDestinationInput(v);
-    setErrors((e) => ({ ...e, destination: "" }));
-    const code = resolveToIata(v);
-    setDestinationIata(code || "");
   }
 
   function onSubmit(e) {
     e.preventDefault();
-    const origin = originIata || resolveToIata(originInput);
-    const destination = destinationIata || resolveToIata(destinationInput);
+
+    const origin = originIata || resolveOnSubmit(originInput);
+    const destination = destinationIata || resolveOnSubmit(destinationInput);
 
     const nextErrors = {
-      origin: origin ? "" : "Please choose a valid city from suggestions.",
-      destination: destination
-        ? ""
-        : "Please choose a valid city from suggestions.",
+      origin: origin ? "" : "Please pick a city from the list.",
+      destination: destination ? "" : "Please pick a city from the list.",
     };
     setErrors(nextErrors);
-
     if (!origin || !destination) return;
 
     const params = new URLSearchParams({
@@ -124,21 +87,9 @@ export default function FlightSearchPage() {
       departureDate,
       ...(returnDate ? { returnDate } : {}),
       adults: String(adults),
-      // Always default to non-stop
-      nonStop: "true",
+      nonStop: "true", // default to non-stop
     });
-
     navigate(`/results?${params.toString()}`);
-  }
-
-  // Helper to show a small status next to fields
-  function ValidityBadge({ ok }) {
-    if (!originInput && !destinationInput) return null;
-    return ok ? (
-      <span className="badge badge-success badge-sm">OK</span>
-    ) : (
-      <span className="badge badge-ghost badge-sm">Pick from list</span>
-    );
   }
 
   return (
@@ -148,69 +99,31 @@ export default function FlightSearchPage() {
           <legend className="fieldset-legend">Route</legend>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label className="label">
-                <span className="label-text">Origin</span>
-                <ValidityBadge ok={!!originIata} />
-              </label>
-              <input
-                className={`input w-full ${errors.origin ? "input-error" : ""}`}
-                placeholder="Type city or IATA (e.g. London or LON)"
-                list="cities-datalist"
-                value={originInput}
-                onChange={(e) => onOriginChange(e.target.value)}
-                onBlur={(e) => onOriginChange(e.target.value)}
-                autoComplete="off"
-                required
-              />
-              {errors.origin && (
-                <p className="text-error text-xs mt-1">{errors.origin}</p>
-              )}
-            </div>
-
-            <div>
-              <label className="label">
-                <span className="label-text">Destination</span>
-                <ValidityBadge ok={!!destinationIata} />
-              </label>
-              <input
-                className={`input w-full ${
-                  errors.destination ? "input-error" : ""
-                }`}
-                placeholder="Type city or IATA (e.g. Paris or PAR)"
-                list="cities-datalist"
-                value={destinationInput}
-                onChange={(e) => onDestinationChange(e.target.value)}
-                onBlur={(e) => onDestinationChange(e.target.value)}
-                autoComplete="off"
-                required
-              />
-              {errors.destination && (
-                <p className="text-error text-xs mt-1">{errors.destination}</p>
-              )}
-            </div>
+            <CityAutocomplete
+              id="origin-city"
+              label="Origin"
+              value={originInput}
+              onChange={setOriginInput}
+              cities={cities}
+              onResolved={(code) => setOriginIata(code)}
+              error={errors.origin}
+              required
+            />
+            <CityAutocomplete
+              id="destination-city"
+              label="Destination"
+              value={destinationInput}
+              onChange={setDestinationInput}
+              cities={cities}
+              onResolved={(code) => setDestinationIata(code)}
+              error={errors.destination}
+              required
+            />
           </div>
 
-          {/* Shared datalist for suggestions */}
-          <datalist id="cities-datalist">
-            {loadingCities ? (
-              <option value="Loading cities…" />
-            ) : (
-              cityOptions.map((c) => (
-                <option
-                  key={`${c.country}-${c.city}`}
-                  value={`${c.city}, ${c.country}`}
-                >
-                  {c.iataCode ? ` (${c.iataCode})` : ""}
-                </option>
-              ))
-            )}
-          </datalist>
-
-          <p className="text-xs opacity-70 mt-2">
-            Choose a city from the suggestions. We’ll use its IATA code
-            automatically.
-          </p>
+          {loadingCities && (
+            <p className="text-xs opacity-70 mt-1">Loading cities…</p>
+          )}
         </fieldset>
 
         <fieldset className="fieldset">
@@ -245,8 +158,6 @@ export default function FlightSearchPage() {
             required
           />
         </fieldset>
-
-        {/* Non-stop option removed; defaulted to true in params */}
 
         <button className="btn btn-primary">Search</button>
       </form>
