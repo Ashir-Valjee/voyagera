@@ -104,7 +104,7 @@ export default function FlightSearchPage() {
     );
 
   return (
-      <section className="w-full max-w-5xl bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-xl">
+      <section className="w-full max-w-5xl bg-white dark:bg-slate-800/95 p-6 sm:p-8 rounded-xl shadow-xl">
 
         <form onSubmit={onSubmit} className="mt-8 space-y-2">
           <fieldset className="fieldset p-0">
@@ -181,30 +181,46 @@ export default function FlightSearchPage() {
           
           
           <fieldset className="fieldset p-0">
-            <legend className="fieldset-legend mb-1 text-base font-medium text-gray-900 dark:text-white">Passengers</legend>
-            <div className="max-w-xs">
+            <legend className="fieldset-legend mb-1 text-base font-medium text-gray-900 dark:text-white">
+              Passengers
+            </legend>
+
+            <div className="flex justify-center">
+              <div className="w-full max-w-md">
                 <div className="flex flex-col">
-                  <label htmlFor="passengers" className="mb-1 text-sm font-medium text-gray-700 dark:text-white">Adults</label>
-                  <div className="relative">
-                    <input 
-                    id="passengers" 
-                    type="number" 
-                    className="input pl-10 w-full text-gray-400" 
-                    min={1} 
-                    max={9} 
-                    value={adults} 
-                    onChange={(e) => setAdults(Number(e.target.value || 1))} required 
-                    />
+                  <label
+                    htmlFor="passengers"
+                    className="mb-1 text-sm font-medium text-gray-700 dark:text-white"
+                  >
+                    Adults
+                  </label>
+
+                  <div className="flex flex-row items-end gap-x-4">
+                    <div className="relative flex-1">
+                      <input
+                        id="passengers"
+                        type="number"
+                        className="input pl-10 w-full text-gray-400"
+                        min={1}
+                        max={9}
+                        value={adults}
+                        onChange={(e) => setAdults(Number(e.target.value || 1))}
+                        required
+                      />
+                    </div>
+
+                    <button className="btn btn-primary shrink-0 whitespace-nowrap">
+                      Search Flights
+                    </button>
                   </div>
                 </div>
+              </div>
             </div>
           </fieldset>
+
+
           
-          <div className="pt-4 flex justify-center">
-            <button className="btn btn-primary w-full sm:w-auto">
-              Search Flights
-            </button>
-          </div>
+          
         </form>
       </section>
   );
