@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { searchFlights } from "../services/flights";
+import { searchFlights, createFlightBooking } from "../services/flights";
+import { fetchCities } from "../services/cities";
 import FlightCard from "./FlightCard";
+import { computeMinutesBetween } from "../utils/helpers";
 
 export default function FlightResults({
   offers,
@@ -25,7 +27,9 @@ export default function FlightResults({
   const [returnDate, setReturnDate] = useState("");
   const [adults, setAdults] = useState(1);
 
-  // Populate form from current URL when opened
+  // per-row booking spinner
+  const [bookingBusyId, setBookingBusyId] = useState(null);
+
   function loadFormFromParams() {
     setOrigin((params.get("origin") || "").toUpperCase());
     setDestination((params.get("destination") || "").toUpperCase());
@@ -49,8 +53,8 @@ export default function FlightResults({
       setLoading(true);
       setErr(null);
       try {
-        const o = params.get("origin") || "";
-        const d = params.get("destination") || "";
+        const o = (params.get("origin") || "").toUpperCase();
+        const d = (params.get("destination") || "").toUpperCase();
         const dep = params.get("departureDate") || "";
         const ret = params.get("returnDate") || undefined;
         const a = Number(params.get("adults") || 1);
@@ -77,7 +81,7 @@ export default function FlightResults({
         });
 
         if (!cancelled) {
-          setOffers(res);
+          setOffers(res || []);
           setLastKey(paramsKey);
         }
       } catch (e) {
@@ -90,16 +94,89 @@ export default function FlightResults({
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paramsKey]);
 
-  const handleSelect = (offer) => {
-    // TODO: call your createFlightBooking mutation
-    console.log("Selected:", offer);
-  };
+  // ---- BOOKING ----
+  function minutesToHoursStr(mins) {
+    if (!mins && mins !== 0) return "0";
+    return (Math.round((mins / 60) * 100) / 100).toFixed(2); // "2.75"
+  }
 
-  const handleRetry = () => {
-    setLastKey(null);
-  };
+  async function handleSelect(offer) {
+    try {
+      setBookingBusyId(offer.id);
+
+      // URL params
+      const originParam = (params.get("origin") || "").toUpperCase();
+      const destParam = (params.get("destination") || "").toUpperCase();
+      const adultsParam = Number(params.get("adults") || 1);
+
+      // Map params -> City rows using iata_code
+      const cities = await fetchCities();
+      const byIata = (code) =>
+        cities.find(
+          (c) => (c.iataCode || "").toUpperCase() === (code || "").toUpperCase()
+        );
+
+      const originCity = byIata(originParam);
+      const destCity = byIata(destParam);
+
+      if (!originCity || !destCity) {
+        throw new Error(
+          "Couldn’t map origin/destination to Cities. Check your City seeds and iata_code values."
+        );
+      }
+
+      // Durations (prefer server minutes if present; else compute)
+      const outMins =
+        offer.outDurationMinutes ??
+        computeMinutesBetween(offer.outDepartureAt, offer.outArrivalAt);
+      const hasReturn = Boolean(offer.retDepartureAt);
+      const retMins = hasReturn
+        ? offer.retDurationMinutes ??
+          computeMinutesBetween(offer.retDepartureAt, offer.retArrivalAt)
+        : 0;
+
+      const totalMins =
+        offer.totalDurationMinutes ??
+        (outMins || 0) + (hasReturn ? retMins || 0 : 0);
+
+      // Build payload for your mutation (Decimal fields as strings)
+      const payload = {
+        departureCityId: originCity.id,
+        destinationCityId: destCity.id,
+
+        departureAirport: offer.outDepartureIata,
+        destinationAirport: offer.outArrivalIata,
+
+        departureDateTime: offer.outDepartureAt,
+        arrivalDateTime: offer.outArrivalAt,
+
+        flightDuration: minutesToHoursStr(totalMins), // e.g. "6.50"
+        numberOfStops: offer.outStops ?? 0,
+        numberOfPassengers: adultsParam,
+
+        totalPrice: String(offer.priceTotal ?? "0.00"),
+        // If your schema has currency, include it:
+        // currency: offer.priceCurrency,
+      };
+
+      const res = await createFlightBooking(payload);
+      if (!res?.success) {
+        throw new Error(res?.errors?.join(", ") || "Booking failed");
+      }
+
+      alert("Flight booked!");
+    } catch (err) {
+      console.error(err);
+      alert(err.message || "Failed to book flight");
+    } finally {
+      setBookingBusyId(null);
+    }
+  }
+
+  const handleRetry = () => setLastKey(null);
 
   // Submit updated search → updates URL (nonStop always "true")
   function onSubmit(e) {
@@ -184,10 +261,9 @@ export default function FlightResults({
                 min={1}
                 max={9}
                 value={adults}
-                onChange={(e) => setAdults(Number(e.target.value))}
+                onChange={(e) => setAdults(Number(e.target.value || 1))}
               />
             </fieldset>
-
             {/* Non-stop option removed; default enforced */}
           </div>
 
@@ -235,7 +311,13 @@ export default function FlightResults({
             {offers.length} flight option{offers.length > 1 ? "s" : ""} found
           </li>
           {offers.map((o) => (
-            <FlightCard key={o.id} offer={o} onSelect={handleSelect} />
+            <FlightCard
+              key={o.id}
+              offer={o}
+              onSelect={handleSelect}
+              // You can pass a busy flag to the card if you want to disable its button:
+              // busy={bookingBusyId === o.id}
+            />
           ))}
         </ul>
       )}
