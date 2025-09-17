@@ -1,4 +1,3 @@
-// src/tests/components/flightSearch.test.jsx
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
@@ -25,7 +24,6 @@ describe('FlightSearch', () => {
             </MemoryRouter>
         );
         
-        // Use actual text from your component
         expect(screen.getByText(/origin/i)).toBeInTheDocument();
         expect(screen.getByText(/destination/i)).toBeInTheDocument();
         expect(screen.getByText(/departure/i)).toBeInTheDocument();
@@ -41,10 +39,7 @@ describe('FlightSearch', () => {
             </MemoryRouter>
         );
         
-        // Fill out the departure date
         await user.type(screen.getByLabelText(/departure/i), '2024-12-25');
-        
-        // Check that the value was set
         expect(screen.getByLabelText(/departure/i)).toHaveValue('2024-12-25');
     });
 
@@ -57,14 +52,8 @@ describe('FlightSearch', () => {
             </MemoryRouter>
         );
         
-        // Fill out required fields
         await user.type(screen.getByLabelText(/departure/i), '2024-12-25');
-        
-        // Click submit button
         await user.click(screen.getByRole('button', { name: /search flights/i }));
-        
-        // Test that form was submitted (you might need to mock navigation)
-        // For now, just test that no errors occurred
-        expect(screen.getByRole('button', { name: /search flights/i })).toBeInTheDocument();
+                expect(screen.getByRole('button', { name: /search flights/i })).toBeInTheDocument();
     });
 });
