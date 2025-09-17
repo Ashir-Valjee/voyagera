@@ -138,7 +138,7 @@ export default function CityAutocomplete({
 
   return (
     <div className="w-full" ref={wrapRef}>
-      <label className="label mb-1 text-sm font-medium text-gray-700" htmlFor={id}>
+      <label className="label mb-1 text-sm font-medium text-gray-700 dark:text-white" htmlFor={id}>
         <span className="label-text">{label}</span>
         {value ? (
           showBadge ? (
@@ -153,7 +153,7 @@ export default function CityAutocomplete({
         <input
           id={id}
           ref={inputRef}
-          className={`input w-full text-gray-900 ${hasError ? "input-error" : ""}`}
+          className={`input w-full text-gray-900 dark:text-white ${hasError ? "input-error" : ""}`}
           placeholder={placeholder}
           value={value}
           onChange={(e) => {
