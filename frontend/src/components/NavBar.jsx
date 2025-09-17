@@ -8,8 +8,8 @@ const NavBar = () => {
     const navigate = useNavigate();
 
     const handleLogout = () => {
-        logout();
         navigate("/");
+        logout();
     };
 
     // Menu items component for reuse in mobile and desktop

@@ -169,7 +169,7 @@ export default function CityAutocomplete({
         {open && suggestions.length > 0 && (
           <ul
             className="menu absolute left-0 right-0 mt-2 p-2 shadow bg-base-100 rounded-box z-50
-                      max-h-64 overflow-y-auto border border-base-200"
+                      max-h-64 overflow-y-auto border border-base-200 text-gray-700 dark:text-white"
             role="listbox"
             aria-labelledby={id}
           >

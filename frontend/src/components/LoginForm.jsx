@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { login } from "../services/auth";
 
 
 export default function LoginForm({ onLogin, onClose }) {
@@ -25,7 +24,7 @@ export default function LoginForm({ onLogin, onClose }) {
       
       // Close the modal on successful login
       document.getElementById('login_modal').close();
-      console.log("Login success:", result);
+      console.log("Login success");
 
       // Update navbar login state
       if (onLogin) onLogin();

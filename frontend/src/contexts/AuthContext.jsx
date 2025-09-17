@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
                 setUser(userData);
             }
         } catch (error) {
-            console.log('No valid session found');
+            console.log(error, 'No valid session found');
             // Clear invalid token
             localStorage.removeItem('access');
             localStorage.removeItem('refresh');
@@ -45,19 +45,24 @@ export function AuthProvider({ children }) {
 
     // Enhanced login function
     const handleLogin = async (email, password) => {
-        try {
-            // Use the existing auth service
-            const tokens = await authLogin(email, password);
-            
-            // Get user data after successful login
-            const userData = await fetchMe();
-            setUser(userData);
-            
-            return { success: true, user: userData };
-        } catch (error) {
-            throw error; // Let the component handle the error
-        }
-    };
+    try {
+        // Get tokens
+        await authLogin(email, password);
+        
+        // Get user data with the new token
+        const userData = await fetchMe();
+
+        // Update state
+        setUser(userData);
+        
+        return { success: true, user: userData };
+    } catch (error) {
+        // If any step fails, perform a full logout to clean up tokens
+        authLogout(); 
+        setUser(null);
+        throw error; 
+    }
+};
 
     // Enhanced logout function
     const handleLogout = () => {
