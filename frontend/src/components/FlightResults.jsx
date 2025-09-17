@@ -176,25 +176,7 @@ export default function FlightResults({
           initialDepartureDate={params.get("departureDate") || ""}
           initialReturnDate={params.get("returnDate") || ""}
           initialAdults={Number(params.get("adults") || 1)}
-          onApply={({
-            origin,
-            destination,
-            departureDate,
-            returnDate,
-            adults,
-          }) => {
-            const q = new URLSearchParams({
-              origin,
-              destination,
-              departureDate,
-              adults: String(Math.max(1, adults)),
-              nonStop: "true",
-            });
-            if (returnDate) q.set("returnDate", returnDate);
-            navigate(`/results?${q.toString()}`);
-            setShowSearch(false);
-            setLastKey(null);
-          }}
+          onApply={handleApplySearch}
           onCancel={() => setShowSearch(false)}
         />
       )}

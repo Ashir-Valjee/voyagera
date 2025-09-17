@@ -109,7 +109,7 @@ export default function FlightCard({
             <div>
               <div className="text-sm font-semibold">Return</div>
               <div className="text-sm">
-                {formatIsoToYMDHM(offer.retDepartureAt)} →{" "}
+                {formatIsoToYMDHM(offer.retDepartureAt)} &#x2192;{" "}
                 {formatIsoToYMDHM(offer.retArrivalAt)}
               </div>
               <div className="text-xs opacity-75">
