@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { signup } from "../services/auth"; 
+import { signup } from "../services/auth";
+import { useAuth } from "../contexts/AuthContext"; // Add this
 import BackgroundImage from "../assets/signup_background.jpg";
 import './SignUp.css';
 
@@ -11,6 +12,7 @@ export default function SignupForm() {
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
+  const { refreshUser } = useAuth(); // Add this
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -18,19 +20,18 @@ export default function SignupForm() {
     setError(null);
 
     try {
-    // 1. Signup
-    const { access, refresh } = await signup(email, password);
-    console.log("Signup success:", { access, refresh });
+      // 1. Signup
+      const { access, refresh } = await signup(email, password);
+      console.log("Signup success:", { access, refresh });
 
+      // 2. Save user email (tokens already saved by signup service)
+      localStorage.setItem("userName", email);
+      window.dispatchEvent(new Event("storage"));
 
-    // 2. Save user email
-    if (access) localStorage.setItem("access", access);
-    if (refresh) localStorage.setItem("refresh", refresh);
-    localStorage.setItem("userName", email);
+      // 3. Refresh the user in AuthContext
+      await refreshUser();
 
-    window.dispatchEvent(new Event("storage"));
-
-    // 3. Redirect to the home page
+      // 4. Redirect to the home page
       navigate("/");
     } catch (err) {
       console.error("Signup error:", err);
@@ -42,6 +43,7 @@ export default function SignupForm() {
     }
   }
 
+  // Rest of component stays the same...
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-cover bg-center relative"
