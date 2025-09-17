@@ -164,7 +164,23 @@ const FlightBookings = ({ bookings, onDelete, onUpdate }) => {
                                     {loadingFlightId === booking.id ? (
                                         <p className="text-center text-base-content/60">Loading activities...</p>
                                     ) : (
-                                        <ActivityBookings bookings={activities[booking.id]} />
+                                        <ActivityBookings
+                                            bookings={activities[booking.id]}
+                                            onUpdate={(updatedActivity) => {
+                                                setActivities((prev) => ({
+                                                    ...prev,
+                                                    [booking.id]: prev[booking.id].map((a) =>
+                                                        a.id === updatedActivity.id ? updatedActivity : a
+                                                    ),
+                                                }));
+                                            }}
+                                            onDelete={(deletedId) => {
+                                                setActivities((prev) => ({
+                                                    ...prev,
+                                                    [booking.id]: prev[booking.id].filter((a) => a.id !== deletedId),
+                                                }));
+                                            }}
+                                        />
                                     )}
                                 </div>
                             </div>
