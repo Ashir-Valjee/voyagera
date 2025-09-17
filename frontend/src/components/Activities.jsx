@@ -120,7 +120,7 @@ export default function Activities() {
             priceMin: est?.amount ?? null,
             priceMax: est?.amount ?? null,
             priceCurrency: est?.currency ?? null,
-            isEstimated: false, // you asked to treat as real prices
+            isEstimated: false,
           };
         });
 
@@ -172,7 +172,6 @@ export default function Activities() {
 
       const categoryUpper = (ev.uiCategory || "Family").toUpperCase();
 
-      // group price = (unit price) * peopleCount
       const unitPrice = ev.priceMin ?? ev.priceMax ?? 0;
       const totalPriceNum = Math.max(0, Number(unitPrice)) * peopleCount;
       const totalPrice = totalPriceNum.toFixed(2);
@@ -180,11 +179,11 @@ export default function Activities() {
       const res = await createActivityBooking(
         ensureDateTimeZ(ev.startDateTime),
         cityRec.id,
-        peopleCount, // <— number_of_people
+        peopleCount,
         categoryUpper,
         ev.name,
         ev.eventUrl,
-        totalPrice, // <— multiplied by passengers
+        totalPrice,
         chosen.id,
         ev.imageUrl || ""
       );
