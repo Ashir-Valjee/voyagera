@@ -145,7 +145,7 @@ export default function FlightSearchPage() {
 
             <div className="flex flex-col gap-1">
               <label className="label" htmlFor="return-date">
-                <span className="label-text">Return date (optional)</span>
+                <span className="label-text">Return date</span>
               </label>
               <input
                 id="return-date"
