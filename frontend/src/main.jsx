@@ -3,13 +3,12 @@ import ReactDOM from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext.jsx";
 
-
 import "./style.css";
 import App from "./App";
-import HomePage from "./pages/HomePage.jsx"
-import SignupPage from "./pages/SignupPage.jsx"
+import HomePage from "./pages/HomePage.jsx";
+import SignupPage from "./pages/SignupPage.jsx";
 import Results from "./pages/Results.jsx";
-import ProfilePage from "./pages/ProfilePage.jsx"
+import ProfilePage from "./pages/ProfilePage.jsx";
 import ErrorPage from "./pages/ErrorPage.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
 
@@ -21,19 +20,15 @@ const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomePage />
+        element: <HomePage />,
       },
       {
         path: "/signup",
-        element: <SignupPage />, 
+        element: <SignupPage />,
       },
       {
         path: "/results",
-        element: (
-          <ProtectedRoute>
-            <Results />
-          </ProtectedRoute>
-        ), 
+        element: <Results />,
       },
       {
         path: "/profile",
@@ -41,9 +36,9 @@ const router = createBrowserRouter([
           <ProtectedRoute>
             <ProfilePage />
           </ProtectedRoute>
-        ), 
+        ),
       },
-    ]
+    ],
   },
 ]);
 
