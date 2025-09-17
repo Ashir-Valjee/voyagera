@@ -94,7 +94,6 @@ export default function FlightSearchPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex flex-col gap-1">
-              {/* CityAutocomplete renders its own label */}
               <CityAutocomplete
                 id="origin-city"
                 label="Origin"
