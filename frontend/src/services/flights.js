@@ -73,13 +73,22 @@ export async function createFlightBooking(
   return data?.createFlightBooking ?? null;
 }
 
-export async function updateFlightBooking(id, numberOfPassengers, totalPrice) {
+export async function updateFlightBooking(booking, newNumberOfPassengers) {
+  const pricePerPassenger = booking.totalPrice / booking.numberOfPassengers;
+  const newTotalPrice = pricePerPassenger * newNumberOfPassengers;
+
   const { data } = await apollo.mutate({
     mutation: UpdateFlightBooking,
-    variables: { id, numberOfPassengers, totalPrice },
+    variables: { 
+      id: booking.id, 
+      numberOfPassengers: newNumberOfPassengers, 
+      totalPrice: newTotalPrice.toFixed(2)
+    },
   });
-  return data?.updateFlightBooking ?? null;
+
+  return data?.updateFlightBooking?.flightBooking ?? null;
 }
+
 
 export async function deleteFlightBooking(id) {
   const { data } = await apollo.mutate({

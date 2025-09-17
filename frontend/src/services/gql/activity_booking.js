@@ -28,6 +28,11 @@ export const ActivityBookingsByFlight = gql`
       activityUrl
       totalPrice
       imageUrl
+      flightBooking {
+        destinationCity {
+          city
+        }
+      }
     }
   }
 `;
