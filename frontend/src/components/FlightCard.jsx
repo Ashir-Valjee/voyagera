@@ -4,6 +4,7 @@ import {
   formatMinutes,
   stopLabel,
 } from "../utils/helpers";
+import PlaneLogo from "../assets/plane-logo.jpg"
 
 export default function FlightCard({ offer, onSelect }) {
   const hasReturn = Boolean(offer.retDepartureIata);
@@ -27,7 +28,7 @@ export default function FlightCard({ offer, onSelect }) {
   return (
     <li className="list-row">
       <div>
-        <img className="size-10 rounded-box" src="plane-logo.jpg" alt="" />
+        <img className="size-10 rounded-box" src={PlaneLogo} alt="" />
       </div>
 
       <div className="min-w-0">
