@@ -138,7 +138,7 @@ export default function CityAutocomplete({
 
   return (
     <div className="w-full" ref={wrapRef}>
-      <label className="label" htmlFor={id}>
+      <label className="label mb-1 text-sm font-medium text-gray-700" htmlFor={id}>
         <span className="label-text">{label}</span>
         {value ? (
           showBadge ? (
@@ -153,7 +153,7 @@ export default function CityAutocomplete({
         <input
           id={id}
           ref={inputRef}
-          className={`input w-full ${hasError ? "input-error" : ""}`}
+          className={`input w-full text-gray-900 ${hasError ? "input-error" : ""}`}
           placeholder={placeholder}
           value={value}
           onChange={(e) => {
@@ -169,7 +169,7 @@ export default function CityAutocomplete({
         {open && suggestions.length > 0 && (
           <ul
             className="menu absolute left-0 right-0 mt-2 p-2 shadow bg-base-100 rounded-box z-50
-                       max-h-64 overflow-y-auto border border-base-200"
+                      max-h-64 overflow-y-auto border border-base-200"
             role="listbox"
             aria-labelledby={id}
           >
