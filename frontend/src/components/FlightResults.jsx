@@ -138,7 +138,7 @@ export default function FlightResults({
   }
 
   const handleRetry = () => setLastKey(null);
-
+  const passengers = Number(params.get("adults") || 1);
   // Called by EditFlightSearch when user submits changes
   function handleApplySearch({
     origin,
@@ -169,7 +169,6 @@ export default function FlightResults({
           {showSearch ? "Close" : "Change search"}
         </button>
       </div>
-
       {showSearch && (
         <EditFlightSearch
           initialOrigin={params.get("origin") || ""}
@@ -199,13 +198,11 @@ export default function FlightResults({
           onCancel={() => setShowSearch(false)}
         />
       )}
-
       {loading && (
         <div className="p-4">
           <span className="loading loading-spinner loading-md" />
         </div>
       )}
-
       {err && (
         <div className="alert alert-error">
           <div className="flex-1">
@@ -216,7 +213,6 @@ export default function FlightResults({
           </button>
         </div>
       )}
-
       {!loading && !err && offers.length === 0 && (
         <p className="opacity-70">
           No results. Try different dates or airports.
@@ -229,7 +225,12 @@ export default function FlightResults({
             {offers.length} flight option{offers.length > 1 ? "s" : ""} found
           </li>
           {offers.map((o) => (
-            <FlightCard key={o.id} offer={o} onSelect={handleSelect} />
+            <FlightCard
+              key={o.id}
+              offer={o}
+              onSelect={handleSelect}
+              passengers={passengers}
+            />
           ))}
         </ul>
       )}
