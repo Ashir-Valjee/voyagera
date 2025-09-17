@@ -7,14 +7,7 @@ export default function TopDestinations({ isOpen, onClose }) {
     const [error, setError] = useState(null);
     const dropdownRef = useRef(null);
 
-    // Example mapping of emojis for each city
-    const cityEmojis = {
-        Vilnius: "🏰",
-        Abuja: "🌴",
-        Manila: "🌊",
-        Melbourne: "🎡",
-        Lyon: "🍷",
-    };
+    const fixedEmojis = ["🏰", "🌴", "🌊", "🎡", "🍷"];
 
     useEffect(() => {
         if (isOpen) {
@@ -32,7 +25,7 @@ export default function TopDestinations({ isOpen, onClose }) {
         }
     }, [isOpen]);
 
-    // Close dropdown when clicking outside
+    
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -64,10 +57,10 @@ export default function TopDestinations({ isOpen, onClose }) {
 
             {!loading && !error && (
                 <ul className="space-y-2">
-                    {destinations.map((dest, idx) => (
+                    {destinations.slice(0, 5).map((dest, idx) => (
                         <li key={idx} className="flex items-center gap-2 font-bold">
-                            <span>{cityEmojis[dest.name] || "✈️"}</span>
-                            <span>{dest.name}</span>
+                            <span>{fixedEmojis[idx]}</span> {/* always fixed */}
+                            <span>{dest.name}</span> {/* dynamic city name */}
                         </li>
                     ))}
                 </ul>
