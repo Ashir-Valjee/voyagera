@@ -1,3 +1,4 @@
+// src/components/FlightResults.jsx
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { searchFlights, createFlightBooking } from "../services/flights";
@@ -27,7 +28,7 @@ export default function FlightResults({
   const [returnDate, setReturnDate] = useState("");
   const [adults, setAdults] = useState(1);
 
-  // per-row booking spinner
+  // per-row booking spinner (optional hook-up to card if you add a busy prop)
   const [bookingBusyId, setBookingBusyId] = useState(null);
 
   function loadFormFromParams() {
@@ -58,7 +59,7 @@ export default function FlightResults({
         const dep = params.get("departureDate") || "";
         const ret = params.get("returnDate") || undefined;
         const a = Number(params.get("adults") || 1);
-        const ns = true; // FORCE non-stop
+        const ns = true; // default non-stop
 
         if (!o || !d || !dep) {
           if (!cancelled) {
@@ -100,7 +101,8 @@ export default function FlightResults({
   // ---- BOOKING ----
   function minutesToHoursStr(mins) {
     if (!mins && mins !== 0) return "0";
-    return (Math.round((mins / 60) * 100) / 100).toFixed(2); // "2.75"
+    const hours = Math.round((mins / 60) * 100) / 100;
+    return String(hours); // e.g. "6.5" or "2.75"
   }
 
   async function handleSelect(offer) {
@@ -124,47 +126,32 @@ export default function FlightResults({
 
       if (!originCity || !destCity) {
         throw new Error(
-          "Couldn’t map origin/destination to Cities. Check your City seeds and iata_code values."
+          "Couldn’t map origin/destination to Cities. Check your City seeds and iata_code values (use city codes like LON/PAR, not LHR/CDG)."
         );
       }
 
-      // Durations (prefer server minutes if present; else compute)
+      // Use OUTBOUND duration only (matches your working version)
       const outMins =
         offer.outDurationMinutes ??
         computeMinutesBetween(offer.outDepartureAt, offer.outArrivalAt);
-      const hasReturn = Boolean(offer.retDepartureAt);
-      const retMins = hasReturn
-        ? offer.retDurationMinutes ??
-          computeMinutesBetween(offer.retDepartureAt, offer.retArrivalAt)
-        : 0;
+      const durationHoursStr = minutesToHoursStr(outMins || 0);
 
-      const totalMins =
-        offer.totalDurationMinutes ??
-        (outMins || 0) + (hasReturn ? retMins || 0 : 0);
+      // IMPORTANT: call your service with the original positional signature
+      const result = await createFlightBooking(
+        offer.outArrivalAt, // arrivalDateTime
+        offer.outDepartureIata, // departureAirport (IATA)
+        originCity.id, // departureCityId
+        offer.outDepartureAt, // departureDateTime
+        offer.outArrivalIata, // destinationAirport (IATA)
+        destCity.id, // destinationCityId
+        durationHoursStr, // flightDuration (Decimal as string)
+        adultsParam, // numberOfPassengers
+        offer.outStops ?? 0, // numberOfStops
+        String(offer.priceTotal ?? "0") // totalPrice (Decimal as string)
+      );
 
-      // Build payload for your mutation (Decimal fields as strings)
-      const payload = {
-        departureCityId: originCity.id,
-        destinationCityId: destCity.id,
-
-        departureAirport: offer.outDepartureIata,
-        destinationAirport: offer.outArrivalIata,
-
-        departureDateTime: offer.outDepartureAt,
-        arrivalDateTime: offer.outArrivalAt,
-
-        flightDuration: minutesToHoursStr(totalMins), // e.g. "6.50"
-        numberOfStops: offer.outStops ?? 0,
-        numberOfPassengers: adultsParam,
-
-        totalPrice: String(offer.priceTotal ?? "0.00"),
-        // If your schema has currency, include it:
-        // currency: offer.priceCurrency,
-      };
-
-      const res = await createFlightBooking(payload);
-      if (!res?.success) {
-        throw new Error(res?.errors?.join(", ") || "Booking failed");
+      if (!result?.success) {
+        throw new Error(result?.errors?.join(", ") || "Booking failed");
       }
 
       alert("Flight booked!");
@@ -188,7 +175,7 @@ export default function FlightResults({
       destination: destination.trim().toUpperCase(),
       departureDate,
       adults: String(Math.max(1, adults)),
-      nonStop: "true", // FORCE non-stop in URL too
+      nonStop: "true",
     });
     if (returnDate) q.set("returnDate", returnDate);
 
@@ -315,7 +302,7 @@ export default function FlightResults({
               key={o.id}
               offer={o}
               onSelect={handleSelect}
-              // You can pass a busy flag to the card if you want to disable its button:
+              // If you add busy visuals inside FlightCard, pass this:
               // busy={bookingBusyId === o.id}
             />
           ))}
