@@ -24,8 +24,6 @@ class ActivityBookingQueries(graphene.ObjectType):
     def resolve_activityBookingsByFlightId(self,info, flight_booking_id):
         user = require_user(info)
         my_activities =  ActivityBooking.objects.filter(flight_booking_id=flight_booking_id, flight_booking__user=user)
-        if not my_activities:
-            raise GraphQLError("no activities found")
         return my_activities
     
     def resolve_single_activity_booking(self,info,id):
@@ -38,6 +36,4 @@ class ActivityBookingQueries(graphene.ObjectType):
     def resolve_activity_bookings_by_user(self, info):
         user = require_user(info)
         activity = ActivityBooking.objects.filter(flight_booking__user=user)
-        if not activity:
-            raise GraphQLError("no activities found")
         return activity
