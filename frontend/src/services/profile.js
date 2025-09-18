@@ -1,39 +1,39 @@
 import { apollo } from "../lib/apollo";
 import { Profile, UpdateProfile } from "./gql/profile";
+import { apiUrl } from "../lib/config";
 
 export async function fetchUserProfile() {
-    const { data } = await apollo.query({
-        query: Profile,
-        fetchPolicy: "network-only"
-    });
-    return data?.getUserProfile ?? null;
+  const { data } = await apollo.query({
+    query: Profile,
+    fetchPolicy: "network-only",
+  });
+  return data?.getUserProfile ?? null;
 }
 
 export async function uploadProfilePicture(file) {
-    const UPLOAD_URL = '/upload/';
-    const token = localStorage.getItem("access");
-    
-    const formData = new FormData();
-    formData.append('file', file);
+  const UPLOAD_URL = apiUrl("/upload/");
+  const token = localStorage.getItem("access");
 
-    const response = await fetch(UPLOAD_URL, {
-        method: 'POST',
-        headers: { 'Authorization': token ? `Bearer ${token}` : '' },
-        body: formData,
-    });
+  const formData = new FormData();
+  formData.append("file", file);
 
-    const jsonResponse = await response.json();
-    if (!response.ok) {
-        throw new Error(jsonResponse.error || 'Upload failed');
-    }
-    return jsonResponse; 
+  const response = await fetch(UPLOAD_URL, {
+    method: "POST",
+    headers: { Authorization: token ? `Bearer ${token}` : "" },
+    body: formData,
+  });
+
+  const jsonResponse = await response.json();
+  if (!response.ok) {
+    throw new Error(jsonResponse.error || "Upload failed");
+  }
+  return jsonResponse;
 }
 
 export async function updateUserProfile(profileInfo) {
-    const { data } = await apollo.mutate({
+  const { data } = await apollo.mutate({
     mutation: UpdateProfile,
-    variables:profileInfo,
-    });
-    return data?.updateProfile ?? null
+    variables: profileInfo,
+  });
+  return data?.updateProfile ?? null;
 }
-

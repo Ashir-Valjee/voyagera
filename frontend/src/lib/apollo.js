@@ -5,9 +5,10 @@ import {
   HttpLink,
   ApolloLink,
 } from "@apollo/client";
+import { apiUrl } from "./config";
 
-const httpLink = new HttpLink({ 
-  uri: "/graphql/",
+const httpLink = new HttpLink({
+  uri: apiUrl("/graphql/"),
 });
 
 const authLink = new ApolloLink((operation, forward) => {
