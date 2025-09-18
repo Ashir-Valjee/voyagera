@@ -23,8 +23,12 @@ const HeroSection = () => {
                 </h2>
 
                 <h2 className="mb-5 text-5xl font-bold  drop-shadow-[0_0_6px_rgba(135,206,250,0.6)]">
-    With Voyagera
-</h2>
+                    Starts Here
+                </h2>
+                {/* <h1 className="mb-5 text-5xl font-bold">
+                    Your Next Adventure
+                    <span className="block ">Starts Here</span>
+                </h1> */}
 
 
                 <p className="mb-5 text-xl text-shadow-lg">
