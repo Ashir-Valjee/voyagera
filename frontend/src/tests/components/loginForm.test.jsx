@@ -87,7 +87,7 @@ describe('LoginForm', () => {
         expect(mockOnLogin).toHaveBeenCalled();
         expect(mockOnClose).toHaveBeenCalled();
         expect(mockModalClose).toHaveBeenCalled();
-        expect(mockNavigate).toHaveBeenCalledWith('/');
+        expect(mockNavigate).toHaveBeenCalledWith('/profile');
 
         expect(screen.getByPlaceholderText(/you@example.com/i)).toHaveValue('');
     });
