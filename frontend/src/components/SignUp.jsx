@@ -18,6 +18,7 @@ export default function SignupForm() {
 
     try {
       await signupAction({ email, password });
+
     } catch (err) {
       console.error("Signup error:", err);
       setError(err.message || "Sign up failed");
