@@ -21,7 +21,7 @@ idna==3.10
 jmespath==1.0.1
 packaging==25.0
 pillow==11.3.0
-promises==2.3           # if you really need it; note your file had "promise==2.3"
+promise==2.3           # if you really need it; note your file had "promise==2.3"
 psycopg2-binary==2.9.10 # keep this; REMOVE 'psycopg'
 PyJWT==2.8.0
 python-dateutil==2.9.0.post0
