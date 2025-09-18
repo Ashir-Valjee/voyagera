@@ -14,10 +14,19 @@ const HeroSection = () => {
         </div>
 
         <div className="hero-content text-center text-neutral-content">
-            <div className="max-w-4xl">
-                <h1 className="mb-5 text-5xl font-bold text-shadow-lg ">
+            <div className=" mb-2max-w-4xl">
+                {/* <h1 className=" text-5xl font-bold text-shadow-lg ">
                     Your Next Adventure
-                </h1>
+                </h1> */}
+                <h2 className="mb-2 text-5xl font-bold drop-shadow-[0_0_6px_rgba(135,206,250,0.6)]">
+                    Your Next Adventure
+                </h2>
+
+                <h2 className="mb-5 text-5xl font-bold  drop-shadow-[0_0_6px_rgba(135,206,250,0.6)]">
+    With Voyagera
+</h2>
+
+
                 <p className="mb-5 text-xl text-shadow-lg">
                     Experience the world like never before—exclusive deals, curated experiences, unforgettable moments.
                 </p>
