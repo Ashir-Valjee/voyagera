@@ -48,7 +48,7 @@ export default function TopDestinations({ isOpen, onClose }) {
             className="absolute mt-2 left-0 bg-white/60 backdrop-blur-md rounded-lg w-64 p-4 z-50"
         >
             {/* Teal heading */}
-            <h2 className="text-md font-semibold mb-3 text-teal-500 italic">
+            <h2 className="text-md font-semibold mb-3 text-teal-500 italic dark:text-blue-950">
                 ✈️ Popular destinations this month!
             </h2>
 
