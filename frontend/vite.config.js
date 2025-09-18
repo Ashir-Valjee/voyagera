@@ -14,11 +14,11 @@ export default defineConfig({
     proxy: {
       // forwards http://localhost:5173/graphql -> http://127.0.0.1:8000/graphql
       "/graphql": {
-        target: "http://127.0.0.1:8000",
+        target: "https://voyagera-api.onrender.com",
         changeOrigin: true,
       },
       "/upload": {
-        target: "http://127.0.0.1:8000",
+        target: "https://voyagera-api.onrender.com",
         changeOrigin: true,
       },
     },
