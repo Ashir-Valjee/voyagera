@@ -46,8 +46,8 @@ def test_activity_booking_by_flight_id_runs(client):
     variables = {"flightBookingId": flight_booking.id}
 
     query = '''
-    query ActivityBookingByFlightId($flightBookingId: Int!) {
-        activityBookingByFlightId(flightBookingId: $flightBookingId) {
+    query ActivityBookingsByFlightId($flightBookingId: Int!) {
+        activityBookingsByFlightId(flightBookingId: $flightBookingId) {
             id
             activityDateTime
             numberOfPeople
@@ -67,7 +67,7 @@ def test_activity_booking_by_flight_id_runs(client):
 
     content = json.loads(response.content)
     assert "errors" not in content
-    assert "activityBookingByFlightId" in content["data"]
+    assert "activityBookingsByFlightId" in content["data"]
     
     
 @pytest.mark.django_db
