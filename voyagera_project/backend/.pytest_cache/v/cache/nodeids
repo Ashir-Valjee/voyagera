@@ -1,0 +1,13 @@
+[
+  "api/tests/models/test_activity_booking.py::test_activity_booking_creation",
+  "api/tests/models/test_activity_booking.py::test_activity_booking_defaults",
+  "api/tests/models/test_activity_booking.py::test_flight_booking_deletion_cascades",
+  "api/tests/models/test_city.py::test_city_creation_and_str",
+  "api/tests/models/test_city.py::test_city_uniqueness_constraint",
+  "api/tests/models/test_flight_booking.py::test_flight_booking_creation",
+  "api/tests/models/test_flight_booking.py::test_flight_booking_defaults",
+  "api/tests/models/test_flight_booking.py::test_user_deletion_cascades_to_bookings",
+  "api/tests/models/test_profile.py::test_profile_creation_defaults",
+  "api/tests/models/test_profile.py::test_profile_str_method",
+  "api/tests/models/test_profile.py::test_profile_with_home_city"
+]

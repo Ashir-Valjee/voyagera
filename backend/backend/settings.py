@@ -22,12 +22,12 @@ load_dotenv()
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-%t25f=!mk#hr#z33hvyu4b+_o_a(sf_5yo3pj1j4v_gtxjaknq'
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['.elasticbeanstalk.com']
+ALLOWED_HOSTS = ['voyagera-prod-lon.eba-mrksa5zn.eu-west-2.elasticbeanstalk.com']
 
 GRAPHENE = {
     "SCHEMA": "api.schema.schema",
