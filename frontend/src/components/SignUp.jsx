@@ -11,7 +11,7 @@ export default function SignupForm() {
   const [error, setError] = useState(null);
 
   const navigate = useNavigate();
-  const { signup } = useAuth();
+  const { signupAction } = useAuth();
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -19,8 +19,8 @@ export default function SignupForm() {
     setError(null);
 
     try {
-      await signup(email, password);
-      navigate("/profile");
+      await signupAction({ email, password });
+      // navigate("/profile");
     } catch (err) {
       console.error("Signup error:", err);
       setError(err.message || "Sign up failed");
