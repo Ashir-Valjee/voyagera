@@ -29,7 +29,40 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG') == 'True'
 
+APP_HOST = os.getenv("APP_HOST", "").strip()  # e.g. voyagera-api.onrender.com
+FRONTEND_HOST = os.getenv("FRONTEND_HOST", "").strip()  # e.g. voyagera-ptij.onrender.com
+
 ALLOWED_HOSTS = ['.onrender.com', 'localhost', '127.0.0.1']
+
+# The Render frontend host (no scheme) — set this as an env var on the backend service
+if APP_HOST:
+    ALLOWED_HOSTS.append(APP_HOST)
+
+CORS_ALLOWED_ORIGINS = []
+CSRF_TRUSTED_ORIGINS = []
+
+if FRONTEND_HOST:
+    CORS_ALLOWED_ORIGINS.append(f"https://{FRONTEND_HOST}")
+    CSRF_TRUSTED_ORIGINS.append(f"https://{FRONTEND_HOST}")
+
+# Allow Authorization header for Bearer tokens (preflight will check this)
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "authorization",
+    "content-type",
+]
+
+# Methods typically used by GraphQL + preflight
+CORS_ALLOW_METHODS = ["GET", "POST", "OPTIONS"]
+
+# If you ever send cookies across origins, set this True (not required for Bearer tokens)
+CORS_ALLOW_CREDENTIALS = False
+
+# Your backend host must be allowed too
+
+# ALLOWED_HOSTS = [h for h in [APP_HOST] if h] or ["localhost", "127.0.0.1"]
+
+
+
 
 GRAPHENE = {
     "SCHEMA": "api.schema.schema",
@@ -70,22 +103,22 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
+    "corsheaders",
     'graphene_django',
     "api.apps.ApiConfig",
     'storages',
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",       # static files
+    "corsheaders.middleware.CorsMiddleware",            # CORS high in stack
+    "django.middleware.common.CommonMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -114,7 +147,8 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 if 'DATABASE_URL' in os.environ:
     DATABASES = {
     'default': dj_database_url.config(
-    default=os.environ.get('DATABASE_URL')
+    default=os.environ.get('DATABASE_URL'),
+    ssl_require=True,
     )
     }
 else:
@@ -175,21 +209,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-CORS_ALLOW_ALL_ORIGINS = True
 
-CORS_ALLOW_HEADERS = list(default_headers) + [
- "authorization",
-]
-CORS_ALLOW_METHODS = [
- "GET",
- "POST",
- "PUT",
- "PATCH",
- "DELETE",
- "OPTIONS",
-]
+CORS_ALLOW_ALL_ORIGINS = False
+
+
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_STORAGE ='whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
