@@ -17,22 +17,23 @@ export default function ResultsPage() {
 
   return (
     <section className="max-w-5xl mx-auto space-y-6">
-      <h1 className="text-3xl font-bold">Results</h1>
-
-      <div role="tablist" className="tabs tabs-bordered">
+      <div
+        role="tablist"
+        className="tabs tabs-bordered flex flex-row justify-center"
+      >
         <button
           role="tab"
           className={`tab ${tab === "flights" ? "tab-active" : ""}`}
           onClick={() => setTab("flights")}
         >
-          Flights
+          <h2 className="text-2xl">Flights</h2>
         </button>
         <button
           role="tab"
           className={`tab ${tab === "activities" ? "tab-active" : ""}`}
           onClick={() => setTab("activities")}
         >
-          Activities
+          <h2 className="text-2xl">Activities</h2>
         </button>
       </div>
 

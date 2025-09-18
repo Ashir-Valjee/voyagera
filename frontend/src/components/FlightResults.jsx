@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { searchFlights, createFlightBooking } from "../services/flights";
 import { fetchCities } from "../services/cities";
 import FlightCard from "./FlightCard";
+import EditFlightSearch from "./EditFlightSearch";
 import { computeMinutesBetween } from "../utils/helpers";
 
 export default function FlightResults({
@@ -20,26 +21,9 @@ export default function FlightResults({
   const navigate = useNavigate();
 
   const [showSearch, setShowSearch] = useState(false);
-  const [origin, setOrigin] = useState("");
-  const [destination, setDestination] = useState("");
-  const [departureDate, setDepartureDate] = useState("");
-  const [returnDate, setReturnDate] = useState("");
-  const [adults, setAdults] = useState(1);
-
   const [bookingBusyId, setBookingBusyId] = useState(null);
 
-  function loadFormFromParams() {
-    setOrigin((params.get("origin") || "").toUpperCase());
-    setDestination((params.get("destination") || "").toUpperCase());
-    setDepartureDate(params.get("departureDate") || "");
-    setReturnDate(params.get("returnDate") || "");
-    setAdults(Number(params.get("adults") || 1));
-  }
-
-  const toggleSearch = () => {
-    if (!showSearch) loadFormFromParams();
-    setShowSearch((s) => !s);
-  };
+  const toggleSearch = () => setShowSearch((s) => !s);
 
   useEffect(() => {
     if (lastKey === paramsKey && offers.length > 0) return;
@@ -154,14 +138,18 @@ export default function FlightResults({
   }
 
   const handleRetry = () => setLastKey(null);
-
-  function onSubmit(e) {
-    e.preventDefault();
-    if (!origin || !destination || !departureDate) return;
-
+  const passengers = Number(params.get("adults") || 1);
+  // Called by EditFlightSearch when user submits changes
+  function handleApplySearch({
+    origin,
+    destination,
+    departureDate,
+    returnDate,
+    adults,
+  }) {
     const q = new URLSearchParams({
-      origin: origin.trim().toUpperCase(),
-      destination: destination.trim().toUpperCase(),
+      origin,
+      destination,
       departureDate,
       adults: String(Math.max(1, adults)),
       nonStop: "true",
@@ -181,88 +169,22 @@ export default function FlightResults({
           {showSearch ? "Close" : "Change search"}
         </button>
       </div>
-
       {showSearch && (
-        <form
-          onSubmit={onSubmit}
-          className="space-y-3 p-4 rounded-box bg-base-100 shadow"
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <fieldset className="fieldset">
-              <legend className="fieldset-legend">Route</legend>
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  className="input"
-                  placeholder="Origin (IATA)"
-                  value={origin}
-                  onChange={(e) => setOrigin(e.target.value.toUpperCase())}
-                  maxLength={3}
-                />
-                <input
-                  className="input"
-                  placeholder="Destination (IATA)"
-                  value={destination}
-                  onChange={(e) => setDestination(e.target.value.toUpperCase())}
-                  maxLength={3}
-                />
-              </div>
-            </fieldset>
-
-            <fieldset className="fieldset">
-              <legend className="fieldset-legend">Dates</legend>
-              <div className="grid grid-cols-2 gap-3">
-                <input
-                  type="date"
-                  className="input"
-                  value={departureDate}
-                  onChange={(e) => setDepartureDate(e.target.value)}
-                  required
-                />
-                <input
-                  type="date"
-                  className="input"
-                  value={returnDate}
-                  onChange={(e) => setReturnDate(e.target.value)}
-                />
-              </div>
-            </fieldset>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <fieldset className="fieldset">
-              <legend className="fieldset-legend">Passengers</legend>
-              <input
-                type="number"
-                className="input"
-                min={1}
-                max={9}
-                value={adults}
-                onChange={(e) => setAdults(Number(e.target.value || 1))}
-              />
-            </fieldset>
-          </div>
-
-          <div className="flex items-center gap-2">
-            <button className="btn btn-primary btn-sm" type="submit">
-              Apply
-            </button>
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm"
-              onClick={() => setShowSearch(false)}
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+        <EditFlightSearch
+          initialOrigin={params.get("origin") || ""}
+          initialDestination={params.get("destination") || ""}
+          initialDepartureDate={params.get("departureDate") || ""}
+          initialReturnDate={params.get("returnDate") || ""}
+          initialAdults={Number(params.get("adults") || 1)}
+          onApply={handleApplySearch}
+          onCancel={() => setShowSearch(false)}
+        />
       )}
-
       {loading && (
         <div className="p-4">
           <span className="loading loading-spinner text-primary loading-md" />
         </div>
       )}
-
       {err && (
         <div className="alert alert-error">
           <div className="flex-1">
@@ -273,7 +195,6 @@ export default function FlightResults({
           </button>
         </div>
       )}
-
       {!loading && !err && offers.length === 0 && (
         <p className="opacity-70">
           No results. Try different dates or airports.
@@ -286,7 +207,12 @@ export default function FlightResults({
             {offers.length} flight option{offers.length > 1 ? "s" : ""} found
           </li>
           {offers.map((o) => (
-            <FlightCard key={o.id} offer={o} onSelect={handleSelect} />
+            <FlightCard
+              key={o.id}
+              offer={o}
+              onSelect={handleSelect}
+              passengers={passengers}
+            />
           ))}
         </ul>
       )}

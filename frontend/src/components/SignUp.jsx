@@ -38,37 +38,33 @@ export default function SignupForm() {
         alt="Signup Background" 
         className="signup-background"
       />
-      
-      <h1 className="absolute top-8 left-8 text-5xl font-bold text-white drop-shadow-lg">
-        Welcome!
-      </h1>
 
       {/* Form card */}
-      <div className="max-w-lg w-full space-y-4">
-        <form onSubmit={onSubmit} className="space-y-4">
-          <fieldset className="fieldset bg-base-200/60 rounded-box p-6">
-            <h2 className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg mb-4">
+      <div className="max-w-2xl w-full space-y-6">
+        <form onSubmit={onSubmit} className="space-y-6">
+          <fieldset className="fieldset bg-base-200/60 backdrop-blur-md rounded-2xl p-10">
+            <h2 className="text-3xl md:text-5xl font-extrabold text-white drop-shadow-lg text-center mb-6">
               Create Account
             </h2>
 
             <label className="label">
-              <span className="label-text">Email</span>
+              <span className="label-text text-lg md:text-xl">Email</span>
             </label>
             <input
               type="email"
-              className="input input-bordered w-full"
+              className="input input-bordered w-full input-lg"
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
             />
 
-            <label className="label">
-              <span className="label-text">Password</span>
+            <label className="label mt-4">
+              <span className="label-text text-lg md:text-xl">Password</span>
             </label>
             <input
               type="password"
-              className="input input-bordered w-full"
+              className="input input-bordered w-full input-lg"
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -77,7 +73,7 @@ export default function SignupForm() {
 
             <button
               type="submit"
-              className={`btn btn-primary mt-4 ${loading ? "loading" : ""}`}
+              className={`btn btn-primary mt-6 ${loading ? "loading" : ""}`}
               disabled={loading}
             >
               {loading ? "Creating…" : "Sign up"}

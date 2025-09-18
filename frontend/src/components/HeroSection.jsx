@@ -1,7 +1,6 @@
-import HeroBackground from "../assets/landscape.jpg"
+import HeroBackground from "../assets/landscapes.jpg"
 import './HeroSection.css';
 import FlightSearch from "../components/FlightSearch";
-
 
 const HeroSection = () => {
     return (
@@ -15,13 +14,25 @@ const HeroSection = () => {
         </div>
 
         <div className="hero-content text-center text-neutral-content">
-            <div className="max-w-4xl">
-                <h1 className="mb-5 text-5xl font-bold">
+            <div className=" mb-2max-w-4xl">
+                {/* <h1 className=" text-5xl font-bold text-shadow-lg ">
                     Your Next Adventure
-                    <span className="block text-accent">Starts Here</span>
-                </h1>
-                <p className="mb-5 text-xl">
-                    Discover amazing places at exclusive deals. Eat, Shop, Visit interesting places around the world.
+                </h1> */}
+                <h2 className="mb-2 text-5xl font-bold drop-shadow-[0_0_6px_rgba(135,206,250,0.6)]">
+                    Your Next Adventure
+                </h2>
+
+                <h2 className="mb-5 text-5xl font-bold  drop-shadow-[0_0_6px_rgba(135,206,250,0.6)]">
+                    Starts Here
+                </h2>
+                {/* <h1 className="mb-5 text-5xl font-bold">
+                    Your Next Adventure
+                    <span className="block ">Starts Here</span>
+                </h1> */}
+
+
+                <p className="mb-5 text-xl text-shadow-lg">
+                    Experience the world like never before—exclusive deals, curated experiences, unforgettable moments.
                 </p>
                 <FlightSearch />
             </div>
