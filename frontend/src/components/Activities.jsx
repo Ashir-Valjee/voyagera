@@ -7,6 +7,7 @@ import {
 } from "../services/activity_booking";
 import { fetchFlightBookings } from "../services/flights";
 import ActivityCard from "./ActivityCard";
+import Pagination from "./Pagination";
 import {
   dayStartZ,
   dayEndZ,
@@ -19,8 +20,12 @@ import {
   toEpochMillis,
 } from "../utils/helpers";
 
+const MAX_FETCH = 50;
+const PAGE_SIZE = 10;
+
 export default function Activities() {
   const [params] = useSearchParams();
+
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
   const [events, setEvents] = useState([]);
@@ -30,10 +35,12 @@ export default function Activities() {
   const [bookings, setBookings] = useState([]);
   const [busyId, setBusyId] = useState(null);
 
+  const [page, setPage] = useState(1);
+
   const destinationParam = (params.get("destination") || "").trim();
   const departureDate = params.get("departureDate") || "";
   const returnDate = params.get("returnDate") || "";
-  const peopleCount = Math.max(1, parseInt(params.get("adults") || "1", 10)); // <— NEW
+  const peopleCount = Math.max(1, parseInt(params.get("adults") || "1", 10));
 
   const { startIso, endIso } = useMemo(() => {
     if (departureDate && returnDate) {
@@ -56,6 +63,7 @@ export default function Activities() {
       setLoading(true);
       setErr(null);
       setEvents([]);
+      setPage(1);
 
       try {
         if (!destinationParam || !startIso || !endIso) {
@@ -68,6 +76,7 @@ export default function Activities() {
           fetchFlightBookings().catch(() => []),
         ]);
         if (cancelled) return;
+
         setCities(citiesList);
         setBookings(Array.isArray(userBookings) ? userBookings : []);
 
@@ -96,10 +105,9 @@ export default function Activities() {
           startDateTime: startIso,
           endDateTime: endIso,
           classificationName: tmFilter,
-          size: 24,
+          size: MAX_FETCH,
         });
 
-        // Ensure each event has a price (use estimate if TM lacks price)
         const withPrices = (results || []).map((ev) => {
           const uiCategory = normalizeCategory(ev?.classificationName);
           const hasPrice = ev.priceMin != null || ev.priceMax != null;
@@ -120,7 +128,7 @@ export default function Activities() {
             priceMin: est?.amount ?? null,
             priceMax: est?.amount ?? null,
             priceCurrency: est?.currency ?? null,
-            isEstimated: false,
+            isEstimated: true,
           };
         });
 
@@ -130,7 +138,11 @@ export default function Activities() {
             (a, b) =>
               toEpochMillis(a.startDateTime) - toEpochMillis(b.startDateTime)
           );
-        if (!cancelled) setEvents(sorted);
+
+        if (!cancelled) {
+          setEvents(sorted);
+          setPage(1);
+        }
       } catch (e) {
         if (!cancelled) {
           console.error(e);
@@ -146,8 +158,19 @@ export default function Activities() {
     };
   }, [destinationParam, startIso, endIso, classification]);
 
+  // pagination math
+  const pageCount = Math.max(1, Math.ceil(events.length / PAGE_SIZE));
+  useEffect(() => {
+    if (page > pageCount) setPage(pageCount);
+  }, [page, pageCount]);
+
+  const startIdx = (page - 1) * PAGE_SIZE;
+  const endIdx = Math.min(events.length, startIdx + PAGE_SIZE);
+  const visible = events.slice(startIdx, endIdx);
+
   async function handleBook(ev) {
     try {
+      if (busyId) return;
       setBusyId(ev.id);
 
       const cityRec =
@@ -211,7 +234,10 @@ export default function Activities() {
           <select
             className="select select-sm select-bordered"
             value={classification}
-            onChange={(e) => setClassification(e.target.value)}
+            onChange={(e) => {
+              setClassification(e.target.value);
+              setPage(1);
+            }}
           >
             <option value="">All</option>
             <option value="Music">Music</option>
@@ -246,17 +272,35 @@ export default function Activities() {
       )}
 
       {!loading && !err && events.length > 0 && (
-        <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {events.map((ev) => (
-            <ActivityCard
-              key={ev.id}
-              ev={ev}
-              peopleCount={peopleCount} // <— NEW
-              onBook={handleBook}
-              busy={busyId === ev.id}
-            />
-          ))}
-        </ul>
+        <>
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            total={events.length}
+            pageSize={PAGE_SIZE}
+            onChange={(p) => setPage(p)}
+          />
+
+          <ul className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {visible.map((ev) => (
+              <ActivityCard
+                key={ev.id}
+                ev={ev}
+                peopleCount={peopleCount}
+                onBook={handleBook}
+                busy={busyId === ev.id}
+              />
+            ))}
+          </ul>
+
+          <Pagination
+            page={page}
+            pageCount={pageCount}
+            total={events.length}
+            pageSize={PAGE_SIZE}
+            onChange={(p) => setPage(p)}
+          />
+        </>
       )}
     </section>
   );
