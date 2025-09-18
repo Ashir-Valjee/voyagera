@@ -2,10 +2,11 @@ import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { AuthProvider, useAuth } from '../../contexts/AuthContext';
 import * as authService from '../../services/auth';
-import * as userService from '../../services/user';
+import * as profileService from '../../services/profile';
+import { MemoryRouter } from "react-router-dom";
 
 vi.mock('../../services/auth');
-vi.mock('../../services/user');
+vi.mock('../../services/profile');
 
 describe('AuthContext', () => {
     beforeEach(() => {
@@ -13,11 +14,17 @@ describe('AuthContext', () => {
         localStorage.clear();
     });
 
+    // Use MemoryRouter in the wrapper
+    const wrapper = ({ children }) => (
+        <MemoryRouter>
+            <AuthProvider>{children}</AuthProvider>
+        </MemoryRouter>
+    );
+
     it('should start with loading true when checking authentication', () => {
         localStorage.setItem('access', 'fake-token');
-        userService.default.mockImplementation(() => new Promise(() => {}));
+        profileService.fetchUserProfile.mockImplementation(() => new Promise(() => {}));
         
-        const wrapper = ({ children }) => <AuthProvider>{children}</AuthProvider>;
         const { result } = renderHook(() => useAuth(), { wrapper });
 
         expect(result.current.user).toBeNull();
@@ -27,9 +34,8 @@ describe('AuthContext', () => {
 
     it('should login successfully and set user', async () => {
         authService.login.mockResolvedValue({ access: 'token', refresh: 'refresh' });
-        userService.default.mockResolvedValue({ email: 'test@example.com' });
+        profileService.fetchUserProfile.mockResolvedValue({ email: 'test@example.com' });
 
-        const wrapper = ({ children }) => <AuthProvider>{children}</AuthProvider>;
         const { result } = renderHook(() => useAuth(), { wrapper });
 
         await act(async () => {
@@ -41,7 +47,6 @@ describe('AuthContext', () => {
     });
 
     it('should logout and clear user', () => {
-        const wrapper = ({ children }) => <AuthProvider>{children}</AuthProvider>;
         const { result } = renderHook(() => useAuth(), { wrapper });
 
         act(() => {

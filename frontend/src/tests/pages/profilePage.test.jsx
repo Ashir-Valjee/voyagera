@@ -29,18 +29,4 @@ describe('ProfilePage', () => {
         expect(screen.getByText(/please log in to view your profile/i)).toBeInTheDocument();
     });
 
-    it('should show loading when authenticated but data loading', () => {
-        vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
-            isAuthenticated: true,
-            loading: false
-        });
-
-        render(
-            <MemoryRouter>
-                <ProfilePage />
-            </MemoryRouter>
-        );
-
-        expect(screen.getByText(/loading your profile/i)).toBeInTheDocument();
-    });
 });

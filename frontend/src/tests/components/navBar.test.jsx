@@ -14,7 +14,7 @@ describe('NavBar', () => {
 
     it('should show Sign In and Sign Up when not authenticated', () => {
         vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
-            user: null,
+            user: { firstName: 'Test', email: 'test@example.com', user: { email: 'test@example.com' } },
             isAuthenticated: false,
             loading: false,
             logout: mockLogout
@@ -34,7 +34,7 @@ describe('NavBar', () => {
 
     it('should show user info and logout when authenticated', () => {
         vi.spyOn(AuthContext, 'useAuth').mockReturnValue({
-            user: { email: 'test@example.com' },
+            user: { firstName: 'Test', email: 'test@example.com', user: { email: 'test@example.com' } },
             isAuthenticated: true,
             loading: false,
             logout: mockLogout
@@ -46,7 +46,7 @@ describe('NavBar', () => {
             </MemoryRouter>
         );
 
-        expect(screen.getByText('Welcome, test@example.com!')).toBeInTheDocument();
+        expect(screen.getByText('Welcome, Test!')).toBeInTheDocument();
         expect(screen.getAllByText('Logout')).toHaveLength(2); // Mobile + Desktop
         expect(screen.queryByText('Sign In')).not.toBeInTheDocument();
     });

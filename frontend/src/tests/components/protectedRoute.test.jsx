@@ -38,7 +38,7 @@ describe('ProtectedRoute', () => {
         </MemoryRouter>
         );
 
-        expect(screen.getByText('Redirecting to /login')).toBeInTheDocument();
+        expect(screen.getByText('Redirecting to /')).toBeInTheDocument();
         expect(screen.queryByText('This is protected content')).not.toBeInTheDocument();
     });
 
