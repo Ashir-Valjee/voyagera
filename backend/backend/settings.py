@@ -110,10 +110,10 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'voyagera',  # <- make sure this matches your db
+        'NAME': os.environ.get("DB_NAME"), 
         'USER': os.environ.get("DB_USERNAME"),
-        'PASSWORD': '',
-        'HOST': 'localhost',
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST'),
         'PORT': '5432',
     }
 }
