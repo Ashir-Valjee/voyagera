@@ -27,7 +27,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['voyagera-prod-lon.eba-mrksa5zn.eu-west-2.elasticbeanstalk.com']
+ALLOWED_HOSTS = ['*']
 
 GRAPHENE = {
     "SCHEMA": "api.schema.schema",
