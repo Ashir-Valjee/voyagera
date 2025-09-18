@@ -45,10 +45,10 @@ export default function TopDestinations({ isOpen, onClose }) {
     return (
         <div
             ref={dropdownRef}
-            className="absolute mt-2 left-0 bg-white/60 backdrop-blur-md rounded-lg w-64 p-4 z-50"
+            className="absolute mt-2 left-0 bg-white/60 dark:bg-gray-900/70 backdrop-blur-md rounded-lg w-64 p-4 z-50 dark:text-gray-100"
         >
             {/* Teal heading */}
-            <h2 className="text-md font-semibold mb-3 text-teal-500 italic">
+            <h2 className="text-md font-semibold mb-3 text-white-600 italic">
                 ✈️ Popular destinations this month!
             </h2>
 
