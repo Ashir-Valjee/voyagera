@@ -29,7 +29,6 @@ export default function SignupForm() {
     }
   }
 
-  // Rest of component stays the same...
   return (
     <div
       className="min-h-screen flex items-center justify-center bg-cover bg-center relative"

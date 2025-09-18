@@ -202,7 +202,7 @@ export default function CityAutocomplete({
         )}
       </div>
 
-      {hasError && <p className="text-error text-xs mt-1">{error}</p>}
+      {hasError && <p className="alert alert-error text-error text-xs mt-1">{error}</p>}
     </div>
   );
 }

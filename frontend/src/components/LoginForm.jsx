@@ -9,7 +9,7 @@ export default function LoginForm({ onLogin, onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   
-  const { login } = useAuth(); // Use our AuthContext login function
+  const { login } = useAuth(); 
 
   const navigate = useNavigate();
 
@@ -19,20 +19,16 @@ export default function LoginForm({ onLogin, onClose }) {
     setError(null);
 
     try {
-      // Use the AuthContext login function
       await login(email, password);
-      
-      // Close the modal on successful login
+
       document.getElementById('login_modal').close();
       console.log("Login success");
 
-      // Update navbar login state
       if (onLogin) onLogin();
 
       setEmail("");
       setPassword("");
 
-      // Close modal
       const modal = document.getElementById("login_modal");
       if (modal) modal.close();
 
