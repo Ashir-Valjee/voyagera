@@ -25,9 +25,9 @@ load_dotenv()
 SECRET_KEY = 'django-insecure-%t25f=!mk#hr#z33hvyu4b+_o_a(sf_5yo3pj1j4v_gtxjaknq'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['.elasticbeanstalk.com']
 
 GRAPHENE = {
     "SCHEMA": "api.schema.schema",
