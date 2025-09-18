@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext"; 
 import BackgroundImage from "../assets/signup_background.jpg";
 import './SignUp.css';
@@ -10,7 +9,6 @@ export default function SignupForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const navigate = useNavigate();
   const { signupAction } = useAuth();
 
   async function onSubmit(e) {
@@ -20,7 +18,7 @@ export default function SignupForm() {
 
     try {
       await signupAction({ email, password });
-      // navigate("/profile");
+
     } catch (err) {
       console.error("Signup error:", err);
       setError(err.message || "Sign up failed");
