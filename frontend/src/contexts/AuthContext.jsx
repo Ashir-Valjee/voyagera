@@ -1,12 +1,15 @@
+/* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from "react";
-import { login as authLogin, logout as authLogout } from "../services/auth";
-import fetchMe from "../services/user";
+import { useNavigate } from "react-router-dom";
+import { login as authLogin, logout as authLogout, signup } from "../services/auth";
+import { fetchUserProfile } from "../services/profile"
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         checkAuthStatus();
@@ -18,11 +21,11 @@ export function AuthProvider({ children }) {
             const token = localStorage.getItem('access');
             if (token) {
                 // Token exists, try to get user info
-                const userData = await fetchMe();
+                const userData = await fetchUserProfile();
                 setUser(userData);
             }
         } catch (error) {
-            console.log('No valid session found');
+            console.log(error, 'No valid session found');
             // Clear invalid token
             localStorage.removeItem('access');
             localStorage.removeItem('refresh');
@@ -34,7 +37,7 @@ export function AuthProvider({ children }) {
     // Add this new method to refresh user after signup
     const refreshUser = async () => {
         try {
-            const userData = await fetchMe();
+            const userData = await fetchUserProfile();
             setUser(userData);
             return userData;
         } catch (error) {
@@ -45,24 +48,50 @@ export function AuthProvider({ children }) {
 
     // Enhanced login function
     const handleLogin = async (email, password) => {
-        try {
-            // Use the existing auth service
-            const tokens = await authLogin(email, password);
-            
-            // Get user data after successful login
-            const userData = await fetchMe();
-            setUser(userData);
-            
-            return { success: true, user: userData };
-        } catch (error) {
-            throw error; // Let the component handle the error
-        }
-    };
+    try {
+        // Get tokens
+        await authLogin(email, password);
+        
+        // Get user data with the new token
+        const userData = await fetchUserProfile();
+
+        // Update state
+        setUser(userData);
+        
+        return { success: true, user: userData };
+    } catch (error) {
+        // If any step fails, perform a full logout to clean up tokens
+        authLogout(); 
+        setUser(null);
+        throw error; 
+    }
+};
 
     // Enhanced logout function
     const handleLogout = () => {
         authLogout(); // Clear tokens from localStorage
         setUser(null); // Clear user from state
+    };
+
+    const signupAction = async (credentials) => {
+        try {
+            await signup(credentials.email, credentials.password);
+            
+            await refreshUser();
+
+            navigate("/profile");
+        } catch (err)
+        {
+            console.error(err);
+            throw err; 
+        }
+    };
+
+    const updateUser = (newUserData) => {
+        setUser(currentUser => {
+            if (!currentUser) return null;
+            return { ...currentUser, ...newUserData };
+        });
     };
 
     const value = {
@@ -71,7 +100,9 @@ export function AuthProvider({ children }) {
         login: handleLogin,
         logout: handleLogout,
         loading,
-        refreshUser  // Add this
+        refreshUser,
+        signupAction,
+        updateUser
     };
 
     return (

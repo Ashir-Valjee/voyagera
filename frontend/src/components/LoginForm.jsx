@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+
 
 export default function LoginForm({ onLogin, onClose }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
   
-  const { login } = useAuth(); // Use our AuthContext login function
+  const { login } = useAuth(); 
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -15,25 +18,22 @@ export default function LoginForm({ onLogin, onClose }) {
     setError(null);
 
     try {
-      // Use the AuthContext login function
-      const result = await login(email, password);
-      
-      // Close the modal on successful login
-      document.getElementById('login_modal').close();
-      console.log("Login success:", result);
+      await login(email, password);
 
-      // Update navbar login state
+      document.getElementById('login_modal').close();
+      console.log("Login success");
+
       if (onLogin) onLogin();
 
       setEmail("");
       setPassword("");
 
-      // Close modal
       const modal = document.getElementById("login_modal");
       if (modal) modal.close();
 
       if (onClose) onClose();
 
+      navigate("/profile");
     } catch (err) {
       console.error("Login error:", err);
       setError(err.message || "Login failed");
