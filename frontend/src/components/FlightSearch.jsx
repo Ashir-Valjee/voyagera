@@ -104,7 +104,7 @@ export default function FlightSearchPage() {
     );
 
   return (
-      <section className="w-full max-w-5xl bg-white dark:bg-slate-800/95 p-6 sm:p-8 rounded-xl shadow-xl">
+      <section className="w-full max-w-5xl bg-white/60 dark:bg-slate-800/60 backdrop-blur-md p-6 sm:p-8 rounded-xl shadow-xl">
 
         <form onSubmit={onSubmit} className="mt-8 space-y-2">
           <fieldset className="fieldset p-0">
