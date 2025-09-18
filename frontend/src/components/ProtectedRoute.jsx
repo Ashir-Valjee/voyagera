@@ -11,7 +11,7 @@ export default function ProtectedRoute({ children }) {
 
     if (!user) {
         // Redirect to login if not authenticated
-        return <Navigate to="/login" replace />;
+        return <Navigate to="/" replace />;
     }
 
     // User is authenticated, render the protected component

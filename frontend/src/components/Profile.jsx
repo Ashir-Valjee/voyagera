@@ -26,9 +26,11 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
   const [tempLastName, setTempLastName] = useState(profile.lastName || "");
   const [activeTab, setActiveTab] = useState("flights");
 
-  useEffect(() => {
-    if (initialProfile) setProfile(initialProfile);
-  }, [initialProfile]);
+    useEffect(() => {
+        if (initialProfile) setProfile(initialProfile);
+    }, [initialProfile]);
+
+    const triggerFileUpload = () => document.getElementById('profile-pic-input').click();
 
   // --- File Upload ---
   const handleFileChange = (event) => {
@@ -39,7 +41,6 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
       handleAutoSave('profilePic', file);
     }
   };
-  const triggerFileUpload = () => document.getElementById('profile-pic-input').click();
 
   // --- Auto save ---
   const handleAutoSave = async (field, value) => {
@@ -209,3 +210,4 @@ const Profile = ({ initialProfile, cities = [], onUpdate }) => {
 };
 
 export default Profile;
+

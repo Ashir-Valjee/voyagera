@@ -6,7 +6,7 @@ import PlaceholderImage from "../assets/Portrait_Placeholder.png";
 import TopDestinations from "./TopDestinations"; // ⬅️ import modal
 
 const NavBar = () => {
-    const { user, isAuthenticated, logout, loading } = useAuth();
+    const { user, isAuthenticated, logout, loading, refetchUser } = useAuth();
     const navigate = useNavigate();
     const [isTopDestinationsOpen, setIsTopDestinationsOpen] = useState(false); // ⬅️ modal state
 
@@ -102,7 +102,7 @@ const NavBar = () => {
             <div className="navbar-end flex items-center gap-2">
                 {isAuthenticated && (
                     <span className="text-sm mr-2">
-                        Welcome, {user?.email || user?.username}!
+                        Welcome, {user?.firstName || user?.user?.email}!
                     </span>
                 )}
 
@@ -155,7 +155,12 @@ const NavBar = () => {
             {/* Login Modal */}
             <dialog id="login_modal" className="modal modal-bottom sm:modal-middle">
                 <div className="modal-box">
-                    <LoginForm />
+                    <LoginForm
+                        onLogin={() => {
+                            refetchUser();
+                            document.getElementById("login_modal")?.close();
+                        }}
+                    />
                     <div className="modal-action">
                         <form method="dialog">
                             <button className="btn">Close</button>
